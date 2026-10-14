@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ZUBI DOWNLOADER — Bulk Video Downloader</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0B0B14;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;padding:14px;max-width:640px;margin:0 auto}
+.header{background:linear-gradient(135deg,#1A1A2E,#16213E);border-radius:18px;padding:22px 18px;text-align:center;margin-bottom:12px;border:1px solid #2a2a4a}
+.header h1{font-size:26px;font-weight:900;letter-spacing:1px}
+.zubi{color:#9F5FFB}.dl{color:#EC4899}
+.header p{color:#8a8aa3;font-size:12px;margin-top:6px}
+.badges{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;background:#252540;color:#b8b8d0}
+.badge.ok{background:#123f2e;color:#10B981}
+.badge.no{background:#3f1a1a;color:#f87171}
+.card{background:#1A1A2E;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #2a2a4a}
+.card-label{font-size:11px;color:#9F5FFB;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+textarea{width:100%;min-height:110px;padding:12px;background:#252540;border:2px solid #333355;border-radius:11px;color:#fff;font-size:13px;outline:none;resize:vertical;font-family:inherit}
+textarea:focus{border-color:#9F5FFB}
+.hint{font-size:11px;color:#64748B;margin-top:6px}
+.dl-btn{width:100%;padding:15px;background:linear-gradient(135deg,#7C3AED,#9F5FFB);border:none;border-radius:13px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px}
+.dl-btn:disabled{opacity:.5;cursor:wait}
+.zip-btn{width:100%;padding:14px;background:linear-gradient(135deg,#059669,#10B981);border:none;border-radius:13px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px;display:none}
+.item{background:#141428;border:1px solid #2a2a4a;border-radius:11px;padding:10px 12px;margin-bottom:8px;display:none}
+.item.show{display:block}
+.item-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.plat{font-size:10px;font-weight:800;padding:3px 9px;border-radius:12px;text-transform:uppercase}
+.plat.tiktok{background:#111;color:#fff;border:1px solid #444}
+.plat.instagram{background:linear-gradient(135deg,#833ab4,#fd1d1d);color:#fff}
+.plat.facebook{background:#1877F2;color:#fff}
+.plat.youtube{background:#c00;color:#fff}
+.plat.rednote{background:#ff2442;color:#fff}
+.plat.unknown{background:#444;color:#ccc}
+.item-url{font-size:11px;color:#8a8aa3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.item-status{font-size:12px;margin:4px 0}
+.save-btn{display:inline-block;padding:9px 18px;background:linear-gradient(135deg,#059669,#10B981);color:#fff;font-size:13px;font-weight:800;border-radius:10px;text-decoration:none;margin-top:4px}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid #9F5FFB;border-top-color:transparent;border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.log-box{background:#0d0d1a;border-radius:11px;padding:11px;max-height:150px;overflow-y:auto;font-size:11px;border:1px solid #1e1e3a;margin-bottom:10px}
+.log-line{padding:2px 0;border-bottom:1px solid #1a1a2e;color:#8a8aa3}
+.c-green{color:#10B981}.c-red{color:#EF4444}.c-yellow{color:#F59E0B}.c-purple{color:#9F5FFB}
+.footer{text-align:center;font-size:11px;color:#4a4a6a;padding:12px}
+.note{background:#2a1e0d;border:1px solid #5a3d1a;border-radius:11px;padding:10px 12px;font-size:11px;color:#d4a574;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span class="zubi">⚡ ZUBI</span> <span class="dl">DOWNLOADER</span></h1>
+  <p>Professional Bulk Video Downloader — 100% Free, No Signup</p>
+  <div class="badges">
+    <span class="badge ok">✓ TikTok</span>
+    <span class="badge ok">✓ Instagram</span>
+    <span class="badge ok">✓ Facebook</span>
+    <span class="badge no">YouTube — jald</span>
+    <span class="badge no">RedNote — jald</span>
+  </div>
+</div>
+
+<div class="note">📌 <b>YouTube / RedNote</b> links ke liye ye web version kaam nahi karta (koi free API nahi). Wo links <b>chat mein bhejo</b> — wahan se download karke de dunga!</div>
+
+<div class="card">
+  <div class="card-label">📎 Video Links (ek line mein ek — max 10)</div>
+  <textarea id="urlInput" placeholder="https://www.tiktok.com/@...&#10;https://www.instagram.com/reel/...&#10;https://www.facebook.com/..."></textarea>
+  <div class="hint">TikTok, Instagram ya Facebook ke links paste karo</div>
+</div>
+
+<button class="dl-btn" id="dlBtn" onclick="startBulk()">⬇ DOWNLOAD VIDEOS</button>
+<button class="zip-btn" id="zipBtn" onclick="downloadZip()">📦 SAB KO ZIP MEIN DOWNLOAD KARO</button>
+
+<div id="items"></div>
+
+<div class="card">
+  <div class="card-label">📋 Log</div>
+  <div class="log-box" id="logBox"><div class="log-line">⚡ ZUBI Downloader ready!</div></div>
+</div>
+
+<div class="footer">ZUBI DOWNLOADER • Apni ya copyright-free videos ke liye istemal karo</div>
+
+<script>
+let resolved = []; // {platform, pageUrl, videoUrl, title}
+
+function log(msg, cls=''){const d=document.createElement('div');d.className='log-line '+cls;d.textContent=msg;const b=document.getElementById('logBox');b.appendChild(d);b.scrollTop=b.scrollHeight;}
+
+function detectPlatform(url){
+  const u=url.toLowerCase();
+  if(u.includes('tiktok.com')||u.includes('vt.tiktok')||u.includes('vm.tiktok'))return'tiktok';
+  if(u.includes('instagram.com')||u.includes('instagr.am'))return'instagram';
+  if(u.includes('facebook.com')||u.includes('fb.watch')||u.includes('fb.com'))return'facebook';
+  if(u.includes('youtube.com')||u.includes('youtu.be'))return'youtube';
+  if(u.includes('xiaohongshu.com')||u.includes('xhslink.com'))return'rednote';
+  return'unknown';
+}
+const platName={tiktok:'TikTok',instagram:'Instagram',facebook:'Facebook',youtube:'YouTube',rednote:'RedNote',unknown:'Unknown'};
+
+// ── TIKTOK ──
+async function resolveTikTok(url){
+  const apis=['https://www.tikwm.com/api/','https://api.tikwm.com/'];
+  for(const api of apis){
+    try{
+      const r=await fetch(`${api}?url=${encodeURIComponent(url)}&hd=1`);
+      const d=await r.json();
+      if(d.code===0&&d.data&&(d.data.hdplay||d.data.play))
+        return{url:d.data.hdplay||d.data.play,title:d.data.title||''};
+    }catch(e){}
+  }
+  throw new Error('TikTok API fail');
+}
+// ── INSTAGRAM ──
+async function resolveInstagram(url){
+  try{
+    const r=await fetch('https://igram.world/api/convert',{method:'POST',
+      headers:{'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest'},
+      body:JSON.stringify({url,lang:'en'})});
+    const d=await r.json();
+    for(const m of (d.media||d.data||[])){
+      const v=m.url||m.src;
+      if(v&&v.includes('.mp4'))return{url:v,title:''};
+    }
+  }catch(e){}
+  try{
+    const r=await fetch('https://snapinsta.app/action.php',{method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'url='+encodeURIComponent(url)+'&lang=en'});
+    const t=await r.text();
+    const m=t.match(/href="(https?:\/\/[^"]+\.mp4[^"]*)"/);
+    if(m)return{url:m[1],title:''};
+  }catch(e){}
+  throw new Error('Instagram API fail');
+}
+// ── FACEBOOK ──
+async function resolveFacebook(url){
+  try{
+    const r=await fetch('https://fdownloader.net/api/ajaxSearch',{method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'q='+encodeURIComponent(url)+'&lang=en'});
+    const d=await r.json();
+    if(d.data){
+      const m=d.data.match(/href="(https?:\/\/[^"]+\.mp4[^"]*)"/);
+      if(m)return{url:m[1],title:''};
+    }
+  }catch(e){}
+  try{
+    const r=await fetch('https://getfvid.com/downloader',{method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'url='+encodeURIComponent(url)});
+    const t=await r.text();
+    const m=t.match(/href="(https?:\/\/[^"]+\.mp4[^"]*)"/);
+    if(m)return{url:m[1],title:''};
+  }catch(e){}
+  throw new Error('Facebook API fail');
+}
+
+async function resolveOne(url){
+  const p=detectPlatform(url);
+  if(p==='tiktok')return{platform:p,...await resolveTikTok(url)};
+  if(p==='instagram')return{platform:p,...await resolveInstagram(url)};
+  if(p==='facebook')return{platform:p,...await resolveFacebook(url)};
+  if(p==='youtube')throw new Error('YouTube: chat mein link bhejo 📩');
+  if(p==='rednote')throw new Error('RedNote: chat mein link bhejo 📩');
+  throw new Error('Platform pehchana nahi gaya');
+}
+
+function makeItem(url, platform){
+  const div=document.createElement('div');
+  div.className='item show';
+  div.innerHTML=`<div class="item-top"><span class="plat ${platform}">${platName[platform]}</span><span class="item-url">${url.substring(0,60)}</span></div><div class="item-status"><span class="spin"></span>Processing…</div>`;
+  document.getElementById('items').appendChild(div);
+  return div;
+}
+
+async function startBulk(){
+  const btn=document.getElementById('dlBtn');
+  const raw=document.getElementById('urlInput').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,10);
+  if(!raw.length){alert('Pehle links paste karo!');return;}
+  btn.disabled=true;btn.textContent='⏳ PROCESSING…';
+  document.getElementById('items').innerHTML='';
+  document.getElementById('zipBtn').style.display='none';
+  resolved=[];
+  log(`🚀 ${raw.length} links process ho rahe…`,'c-purple');
+  for(let i=0;i<raw.length;i++){
+    const url=raw[i];
+    const plat=detectPlatform(url);
+    const el=makeItem(url,plat);
+    const st=el.querySelector('.item-status');
+    try{
+      log(`[${i+1}/${raw.length}] ${platName[plat]}…`);
+      const r=await resolveOne(url);
+      resolved.push({platform:plat,pageUrl:url,videoUrl:r.url,title:r.title});
+      const fname=`ZUBI_${plat.toUpperCase()}_${Date.now()}_${i+1}.mp4`;
+      st.innerHTML=`<span class="c-green">✅ Video ready!</span><br><a class="save-btn" href="${r.url}" download="${fname}">💾 SAVE KARO</a>`;
+      try{const a=document.createElement('a');a.href=r.url;a.download=fname;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),800);}catch(e){}
+      log(`✅ [${i+1}] ready`,'c-green');
+    }catch(e){
+      st.innerHTML=`<span class="c-red">❌ ${e.message}</span>`;
+      log(`❌ [${i+1}] ${e.message}`,'c-red');
+    }
+  }
+  if(resolved.length){
+    document.getElementById('zipBtn').style.display='block';
+    document.getElementById('zipBtn').textContent=`📦 ${resolved.length} VIDEOS KO ZIP MEIN DOWNLOAD KARO`;
+  }
+  btn.disabled=false;btn.textContent='⬇ DOWNLOAD VIDEOS';
+  log(`🏁 Done: ${resolved.length}/${raw.length} ready`,'c-purple');
+}
+
+async function downloadZip(){
+  const btn=document.getElementById('zipBtn');
+  btn.disabled=true;btn.textContent='⏳ ZIP ban raha…';
+  log('📦 ZIP ban raha…','c-purple');
+  try{
+    const zip=new JSZip();
+    let ok=0;
+    for(let i=0;i<resolved.length;i++){
+      const v=resolved[i];
+      try{
+        log(`  ZIP mein [${i+1}/${resolved.length}]…`);
+        const r=await fetch(v.videoUrl);
+        if(!r.ok)throw new Error('fetch fail');
+        const blob=await r.blob();
+        zip.file(`ZUBI_${v.platform.toUpperCase()}_${i+1}.mp4`,blob);
+        ok++;
+      }catch(e){log(`  ⚠ [${i+1}] ZIP mein nahi aaya — Save button use karo`,'c-yellow');}
+    }
+    if(!ok)throw new Error('Koi video ZIP mein nahi aayi — alag alag Save karo');
+    const blob=await zip.generateAsync({type:'blob'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`ZUBI_Downloads_${Date.now()}.zip`;
+    document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),1000);
+    log(`✅ ZIP ready! (${ok} videos)`,'c-green');
+  }catch(e){log('❌ '+e.message,'c-red');alert(e.message);}
+  btn.disabled=false;
+}
+</script>
+</body>
+</html>
