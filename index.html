@@ -83,6 +83,20 @@ textarea:focus{border-color:#9F5FFB}
 <div class="footer">ZUBI DOWNLOADER • Apni ya copyright-free videos ke liye istemal karo</div>
 
 <script>
+// APK (WebView) detect karo — wahan blob download kaam nahi karta
+function isAppMode(){
+  const ua=navigator.userAgent||'';
+  return /\bwv\b/i.test(ua)||/WebView/i.test(ua)||window.AndroidBridge!==undefined;
+}
+// App mein khulne par tip dikhao
+window.addEventListener('DOMContentLoaded',()=>{
+  if(isAppMode()){
+    const n=document.createElement('div');
+    n.className='note';
+    n.innerHTML='📲 <b>App mode:</b> Download button dabane par system download shuru hogi — <b>notifications</b> mein dekho. Behtar tajurbe ke liye Chrome mein kholo → Menu → <b>Add to Home Screen</b> 📌';
+    document.querySelector('.header').after(n);
+  }
+});
 let resolved = []; // {platform, pageUrl, videoUrl, title}
 
 function log(msg, cls=''){const d=document.createElement('div');d.className='log-line '+cls;d.textContent=msg;const b=document.getElementById('logBox');b.appendChild(d);b.scrollTop=b.scrollHeight;}
@@ -203,10 +217,18 @@ async function startBulk(){
     }
   }
   if(resolved.length){
-    document.getElementById('zipBtn').style.display='block';
-    document.getElementById('zipBtn').textContent=`📦 ${resolved.length} VIDEOS KO ZIP MEIN DOWNLOAD KARO`;
-    document.getElementById('allBtn').style.display='block';
-    document.getElementById('allBtn').textContent=`⬇ ${resolved.length} VIDEOS ALAG ALAG DOWNLOAD KARO`;
+    if(isAppMode()){
+      // APK mein ZIP kaam nahi karta (WebView blob support nahi) — sirf alag alag download
+      document.getElementById('zipBtn').style.display='none';
+      document.getElementById('allBtn').style.display='block';
+      document.getElementById('allBtn').textContent=`⬇ ${resolved.length} VIDEOS DOWNLOAD KARO`;
+      log('📲 App mode: neeche wala button dabao — sab download hongi','c-purple');
+    }else{
+      document.getElementById('zipBtn').style.display='block';
+      document.getElementById('zipBtn').textContent=`📦 ${resolved.length} VIDEOS KO ZIP MEIN DOWNLOAD KARO`;
+      document.getElementById('allBtn').style.display='block';
+      document.getElementById('allBtn').textContent=`⬇ ${resolved.length} VIDEOS ALAG ALAG DOWNLOAD KARO`;
+    }
   }
   btn.disabled=false;btn.textContent='⬇ DOWNLOAD VIDEOS';
   log(`🏁 Done: ${resolved.length}/${raw.length} ready`,'c-purple');
@@ -237,6 +259,20 @@ async function downloadOne(btn){
   const fname=btn.dataset.fname;
   const v=resolved[idx];
   if(!v)return;
+
+  // ── APK/WebView mode: seedha system download manager ko do ──
+  if(isAppMode()){
+    log(`📲 App mode: "${fname}" system download mein bhej raha…`);
+    const a=document.createElement('a');
+    a.href=v.videoUrl;a.style.display='none';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>a.remove(),1000);
+    btn.textContent='📲 Download shuru!';
+    log('📲 Notifications panel check karo — download wahan hogi','c-green');
+    return;
+  }
+
+  // ── Browser mode: blob se (download attribute kaam karega) ──
   const orig=btn.textContent;
   btn.disabled=true;btn.textContent='⏳ Download ho raha…';
   log(`⬇ "${fname}" download ho raha…`);
@@ -284,9 +320,24 @@ async function downloadZip(){
   btn.disabled=false;btn.textContent='📦 ZIP MEIN DOWNLOAD KARO';
 }
 
-// sab videos alag alag DIRECT download karo (blob se — khulengi nahi)
+// sab videos alag alag DIRECT download karo
 async function downloadAllSeparate(){
   if(!resolved.length)return;
+  // ── APK mode: seedhe links system download manager ko ──
+  if(isAppMode()){
+    log(`📲 App mode: ${resolved.length} videos system download mein bhej raha…`,'c-purple');
+    resolved.forEach((v,i)=>{
+      setTimeout(()=>{
+        const a=document.createElement('a');
+        a.href=v.videoUrl;a.style.display='none';
+        document.body.appendChild(a);a.click();
+        setTimeout(()=>a.remove(),800);
+        log(`  📲 [${i+1}] bheji — notifications check karo`,'c-green');
+      }, i*1200);
+    });
+    return;
+  }
+  // ── Browser mode: blob se ──
   log(`⬇ ${resolved.length} videos download ho rahi… ek ek karke`,'c-purple');
   for(let i=0;i<resolved.length;i++){
     const v=resolved[i];
