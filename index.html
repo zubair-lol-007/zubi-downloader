@@ -36,7 +36,8 @@ textarea:focus{border-color:#9F5FFB}
 .plat.unknown{background:#444;color:#ccc}
 .item-url{font-size:11px;color:#8a8aa3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .item-status{font-size:12px;margin:4px 0}
-.save-btn{display:inline-block;padding:9px 18px;background:linear-gradient(135deg,#059669,#10B981);color:#fff;font-size:13px;font-weight:800;border-radius:10px;text-decoration:none;margin-top:4px}
+.save-btn{display:inline-block;padding:9px 18px;background:linear-gradient(135deg,#059669,#10B981);color:#fff;font-size:13px;font-weight:800;border-radius:10px;text-decoration:none;margin-top:4px;border:none;cursor:pointer;font-family:inherit}
+.save-btn:disabled{opacity:.6;cursor:wait}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid #9F5FFB;border-top-color:transparent;border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .log-box{background:#0d0d1a;border-radius:11px;padding:11px;max-height:150px;overflow-y:auto;font-size:11px;border:1px solid #1e1e3a;margin-bottom:10px}
@@ -191,11 +192,11 @@ async function startBulk(){
     try{
       log(`[${i+1}/${raw.length}] ${platName[plat]}…`);
       const r=await resolveOne(url);
+      const idx=resolved.length;
       resolved.push({platform:plat,pageUrl:url,videoUrl:r.url,title:r.title});
       const fname=`ZUBI_${plat.toUpperCase()}_${Date.now()}_${i+1}.mp4`;
-      st.innerHTML=`<span class="c-green">✅ Video ready!</span><br><a class="save-btn" href="${r.url}" download="${fname}">💾 SAVE KARO</a>`;
-      try{const a=document.createElement('a');a.href=r.url;a.download=fname;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),800);}catch(e){}
-      log(`✅ [${i+1}] ready`,'c-green');
+      st.innerHTML=`<span class="c-green">✅ Video ready!</span><br><button class="save-btn" data-idx="${idx}" data-fname="${fname}" onclick="downloadOne(this)">💾 DOWNLOAD</button>`;
+      log(`✅ [${i+1}] ready — DOWNLOAD dabao`,'c-green');
     }catch(e){
       st.innerHTML=`<span class="c-red">❌ ${e.message}</span>`;
       log(`❌ [${i+1}] ${e.message}`,'c-red');
@@ -230,6 +231,31 @@ async function fetchVideoBlob(url){
   throw new Error('blocked');
 }
 
+// ek video direct download karo (blob se — open nahi hogi)
+async function downloadOne(btn){
+  const idx=parseInt(btn.dataset.idx);
+  const fname=btn.dataset.fname;
+  const v=resolved[idx];
+  if(!v)return;
+  const orig=btn.textContent;
+  btn.disabled=true;btn.textContent='⏳ Download ho raha…';
+  log(`⬇ "${fname}" download ho raha…`);
+  try{
+    const blob=await fetchVideoBlob(v.videoUrl);
+    const burl=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=burl;a.download=fname;a.style.display='none';
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{a.remove();URL.revokeObjectURL(burl);},3000);
+    btn.textContent='✅ Ho gaya!';
+    log(`✅ "${fname}" download shuru!`,'c-green');
+  }catch(e){
+    btn.disabled=false;btn.textContent=orig;
+    log(`❌ Download fail — video khol raha hun, wahan se save kar lo`,'c-yellow');
+    window.open(v.videoUrl,'_blank');
+  }
+}
+
 async function downloadZip(){
   const btn=document.getElementById('zipBtn');
   btn.disabled=true;btn.textContent='⏳ ZIP ban raha… (thoda time lagega)';
@@ -258,21 +284,28 @@ async function downloadZip(){
   btn.disabled=false;btn.textContent='📦 ZIP MEIN DOWNLOAD KARO';
 }
 
-// sab videos alag alag download karo (100% reliable — proxy ki zaroorat nahi)
-function downloadAllSeparate(){
+// sab videos alag alag DIRECT download karo (blob se — khulengi nahi)
+async function downloadAllSeparate(){
   if(!resolved.length)return;
-  log(`⬇ ${resolved.length} videos alag alag download ho rahi…`,'c-purple');
-  resolved.forEach((v,i)=>{
-    setTimeout(()=>{
+  log(`⬇ ${resolved.length} videos download ho rahi… ek ek karke`,'c-purple');
+  for(let i=0;i<resolved.length;i++){
+    const v=resolved[i];
+    const fname=`ZUBI_${v.platform.toUpperCase()}_${Date.now()}_${i+1}.mp4`;
+    try{
+      log(`  ⬇ [${i+1}/${resolved.length}] la raha…`);
+      const blob=await fetchVideoBlob(v.videoUrl);
+      const burl=URL.createObjectURL(blob);
       const a=document.createElement('a');
-      a.href=v.videoUrl;
-      a.download=`ZUBI_${v.platform.toUpperCase()}_${Date.now()}_${i+1}.mp4`;
-      a.style.display='none';
+      a.href=burl;a.download=fname;a.style.display='none';
       document.body.appendChild(a);a.click();
-      setTimeout(()=>a.remove(),1000);
-      log(`  ⬇ [${i+1}] download shuru`,'c-green');
-    }, i*1500);
-  });
+      await new Promise(r=>setTimeout(r,1200));
+      a.remove();URL.revokeObjectURL(burl);
+      log(`  ✅ [${i+1}] download shuru`,'c-green');
+    }catch(e){
+      log(`  ❌ [${i+1}] fail — uska DOWNLOAD button dabao`,'c-yellow');
+    }
+  }
+  log('🏁 Sab complete!','c-purple');
 }
 </script>
 </body>
