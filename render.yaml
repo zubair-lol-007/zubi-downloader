@@ -1,0 +1,8 @@
+# ZUBI DOWNLOADER — Render.com one-click deploy
+services:
+  - type: web
+    name: zubi-downloader
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    dockerfilePath: ./Dockerfile

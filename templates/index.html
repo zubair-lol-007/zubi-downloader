@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ ZUBI DOWNLOADER — Professional Bulk Video Downloader</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <h1><span class="bolt">⚡</span> <span class="zubi">ZUBI</span> DOWNLOADER</h1>
+    <p class="tagline">PROFESSIONAL BULK VIDEO DOWNLOADER</p>
+    <div class="badges">
+      <span class="badge b-yt">▶ YouTube</span>
+      <span class="badge b-tt">♪ TikTok</span>
+      <span class="badge b-fb">f Facebook</span>
+      <span class="badge b-rn">RedNote</span>
+    </div>
+  </header>
+
+  <div class="steps">
+    <div class="step"><b>1</b><span>Links paste karo<br><small>har line mein 1 link</small></span></div>
+    <div class="step"><b>2</b><span>Quality chuno<br><small>Best / HD / SD</small></span></div>
+    <div class="step"><b>3</b><span>Download dabao<br><small>sab videos ZIP mein</small></span></div>
+  </div>
+
+  <main class="card">
+    <label class="lbl" for="urls">🔗 Video Links <span class="muted">(max 10 — har line mein 1 link)</span></label>
+    <textarea id="urls" rows="6" placeholder="https://youtube.com/shorts/xxxx&#10;https://www.tiktok.com/@user/video/xxxx&#10;https://fb.watch/xxxx&#10;https://www.xiaohongshu.com/..."></textarea>
+    <div id="detect" class="detect">— links paste karte hi platform yahan show hogi —</div>
+
+    <div class="row">
+      <div class="quality">
+        <label class="lbl" for="quality">🎞️ Quality</label>
+        <select id="quality">
+          <option value="best">🌟 Best quality</option>
+          <option value="hd" selected>🎬 HD (720p)</option>
+          <option value="sd">📱 SD (480p) — fast</option>
+        </select>
+      </div>
+      <button id="dlBtn" class="bigbtn">⬇️ DOWNLOAD ALL</button>
+    </div>
+  </main>
+
+  <section id="progressCard" class="card hidden">
+    <label class="lbl">📊 Progress</label>
+    <div id="log" class="log"></div>
+    <a id="zipBtn" class="bigbtn hidden" href="#">📦 ZIP DOWNLOAD KARO</a>
+  </section>
+
+  <footer>⚡ ZUBI DOWNLOADER © 2026 &nbsp;•&nbsp; sirf public videos &nbsp;•&nbsp; apne khud ke ya copyright-free content ke liye</footer>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
