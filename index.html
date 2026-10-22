@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>ZUBI DOWNLOADER — Bulk Video Downloader</title>
+<title>ZUBI DOWNLOADER — Bulk Video Downloader + FB Bulk Upload</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -15,15 +15,20 @@ body{background:#0B0B14;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-h
 .badges{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
 .badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;background:#252540;color:#b8b8d0}
 .badge.ok{background:#123f2e;color:#10B981}
-.badge.no{background:#3f1a1a;color:#f87171}
+.badge.blue{background:#12325f;color:#60a5fa}
 .card{background:#1A1A2E;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #2a2a4a}
 .card-label{font-size:11px;color:#9F5FFB;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
 textarea{width:100%;min-height:110px;padding:12px;background:#252540;border:2px solid #333355;border-radius:11px;color:#fff;font-size:13px;outline:none;resize:vertical;font-family:inherit}
 textarea:focus{border-color:#9F5FFB}
+input[type=text],input[type=password]{width:100%;padding:11px;background:#252540;border:2px solid #333355;border-radius:11px;color:#fff;font-size:13px;outline:none;font-family:inherit;margin-bottom:8px}
+input:focus{border-color:#9F5FFB}
 .hint{font-size:11px;color:#64748B;margin-top:6px}
 .dl-btn{width:100%;padding:15px;background:linear-gradient(135deg,#7C3AED,#9F5FFB);border:none;border-radius:13px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px}
 .dl-btn:disabled{opacity:.5;cursor:wait}
 .zip-btn{width:100%;padding:14px;background:linear-gradient(135deg,#059669,#10B981);border:none;border-radius:13px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px;display:none}
+.mini-btn{padding:10px 12px;background:#252540;border:1px solid #3a3a5f;border-radius:11px;color:#d5d5ea;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.mini-row{display:flex;gap:8px;margin-bottom:10px}
+.mini-row .mini-btn{flex:1}
 .item{background:#141428;border:1px solid #2a2a4a;border-radius:11px;padding:10px 12px;margin-bottom:8px;display:none}
 .item.show{display:block}
 .item-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -38,6 +43,7 @@ textarea:focus{border-color:#9F5FFB}
 .item-status{font-size:12px;margin:4px 0}
 .save-btn{display:inline-block;padding:9px 18px;background:linear-gradient(135deg,#059669,#10B981);color:#fff;font-size:13px;font-weight:800;border-radius:10px;text-decoration:none;margin-top:4px;border:none;cursor:pointer;font-family:inherit}
 .save-btn:disabled{opacity:.6;cursor:wait}
+.wa-btn{display:inline-block;padding:9px 18px;background:#25D366;color:#07351a;font-size:13px;font-weight:800;border-radius:10px;text-decoration:none;margin-top:6px;border:none;cursor:pointer;font-family:inherit}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid #9F5FFB;border-top-color:transparent;border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .log-box{background:#0d0d1a;border-radius:11px;padding:11px;max-height:150px;overflow-y:auto;font-size:11px;border:1px solid #1e1e3a;margin-bottom:10px}
@@ -45,28 +51,44 @@ textarea:focus{border-color:#9F5FFB}
 .c-green{color:#10B981}.c-red{color:#EF4444}.c-yellow{color:#F59E0B}.c-purple{color:#9F5FFB}
 .footer{text-align:center;font-size:11px;color:#4a4a6a;padding:12px}
 .note{background:#2a1e0d;border:1px solid #5a3d1a;border-radius:11px;padding:10px 12px;font-size:11px;color:#d4a574;margin-bottom:10px}
+.note.green{background:#0d2a1a;border-color:#1a5a3d;color:#8fd4ae}
+.wa-float{position:fixed;right:16px;bottom:16px;z-index:99;display:flex;align-items:center;gap:8px;background:#25D366;color:#06351a;font-weight:800;font-size:14px;padding:13px 18px;border-radius:40px;text-decoration:none;box-shadow:0 6px 20px rgba(37,211,102,.45)}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{flex:1;padding:9px;text-align:center;background:#252540;border:1px solid #3a3a5f;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;color:#b8b8d0}
+.tab.active{background:#1877F2;color:#fff;border-color:#1877F2}
+.progress{height:8px;background:#252540;border-radius:6px;overflow:hidden;margin-top:6px;display:none}
+.progress div{height:100%;background:linear-gradient(90deg,#1877F2,#60a5fa);width:0%}
+.up-row{background:#141428;border:1px solid #2a2a4a;border-radius:11px;padding:10px 12px;margin-bottom:8px;font-size:12px}
+.thumb-img{width:100%;border-radius:11px;margin-top:8px;display:none}
+ol.steps{font-size:11px;color:#8a8aa3;margin:6px 0 6px 16px;line-height:1.7}
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1><span class="zubi">⚡ ZUBI</span> <span class="dl">DOWNLOADER</span></h1>
-  <p>Professional Bulk Video Downloader — 100% Free, No Signup</p>
+  <p>Professional Bulk Video Downloader + Facebook Bulk Upload — 100% Free</p>
   <div class="badges">
     <span class="badge ok">✓ TikTok</span>
     <span class="badge ok">✓ Instagram</span>
     <span class="badge ok">✓ Facebook</span>
-    <span class="badge no">YouTube — jald</span>
-    <span class="badge no">RedNote — jald</span>
+    <span class="badge ok">✓ YouTube</span>
+    <span class="badge ok">✓ RedNote</span>
+    <span class="badge blue">📤 FB Bulk Upload</span>
   </div>
 </div>
 
-<div class="note">📌 <b>YouTube / RedNote</b> links ke liye ye web version kaam nahi karta (koi free API nahi). Wo links <b>chat mein bhejo</b> — wahan se download karke de dunga!</div>
+<div class="note">📌 <b>YouTube / RedNote:</b> pehle auto download try hoga. Agar koi mushkil link fail ho jaye to us video ke neeche <b>WhatsApp wala button</b> ayega — wahan link bhejo, download karke wapas bhej diya jayega! 💬</div>
 
 <div class="card">
   <div class="card-label">📎 Video Links (ek line mein ek — max 10)</div>
-  <textarea id="urlInput" placeholder="https://www.tiktok.com/@...&#10;https://www.instagram.com/reel/...&#10;https://www.facebook.com/..."></textarea>
-  <div class="hint">TikTok, Instagram ya Facebook ke links paste karo</div>
+  <textarea id="urlInput" placeholder="https://www.tiktok.com/@...&#10;https://www.youtube.com/watch?v=...&#10;https://www.instagram.com/reel/...&#10;https://www.facebook.com/...&#10;http://xhslink.com/..."></textarea>
+  <div class="hint">TikTok, Instagram, Facebook, YouTube ya RedNote ke links paste karo — ya poora chat text paste karke neeche wala "Links Nikalo" dabao</div>
+</div>
+
+<div class="mini-row">
+  <button class="mini-btn" onclick="extractLinks()">🧹 Links Nikalo (chat text se)</button>
+  <button class="mini-btn" onclick="sendLinksWhatsApp()">📤 Links WhatsApp Par Bhejo</button>
 </div>
 
 <button class="dl-btn" id="dlBtn" onclick="startBulk()">⬇ DOWNLOAD VIDEOS</button>
@@ -76,19 +98,64 @@ textarea:focus{border-color:#9F5FFB}
 <div id="items"></div>
 
 <div class="card">
+  <div class="card-label">📘 Facebook Bulk Upload — Page Par Videos</div>
+  <div class="hint" style="margin:0 0 8px">Apne Facebook Page par ek saath bohat si videos upload karo — bilkul free. Token sirf tumhare browser mein rehta hai, kahin save ya send nahi hota 🔒</div>
+  <input type="text" id="fbPageId" placeholder="Page ID (masalan 123456789012345)">
+  <input type="password" id="fbToken" placeholder="Page Access Token yahan paste karo">
+  <button class="mini-btn" style="width:100%;margin-bottom:8px" onclick="checkFbPage()">🔍 Page Check Karo</button>
+  <div id="fbPageInfo" class="hint" style="margin-bottom:8px"></div>
+  <div class="tabs">
+    <div class="tab active" id="tabFiles" onclick="fbTab('files')">📁 Mobile/PC Se Files</div>
+    <div class="tab" id="tabUrls" onclick="fbTab('urls')">🔗 Video URLs Se</div>
+  </div>
+  <div id="fbFilesBox">
+    <input type="file" id="fbFiles" accept="video/*" multiple style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
+    <div id="fbFileList"></div>
+  </div>
+  <div id="fbUrlsBox" style="display:none">
+    <textarea id="fbUrls" style="min-height:80px" placeholder="Ek line mein ek video URL — jo videos Page par upload karni hain"></textarea>
+  </div>
+  <textarea id="fbDesc" style="min-height:60px" placeholder="Sab videos ki shared description / caption (optional)"></textarea>
+  <button class="dl-btn" id="fbUpBtn" style="background:linear-gradient(135deg,#1877F2,#60a5fa);margin-top:10px" onclick="startFbUpload()">📤 PAGE PAR BULK UPLOAD KARO</button>
+  <div id="fbLog"></div>
+  <div class="hint">Token kahan se milega?
+    <ol class="steps">
+      <li>developers.facebook.com/tools/explorer kholo</li>
+      <li>Apna app select karo → "Get Token" → "Get Page Access Token"</li>
+      <li>Apna Page select karo, permissions (pages_manage_posts) allow karo</li>
+      <li>Token copy karke upar paste kar do — bas!</li>
+    </ol>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-label">🖼 YouTube Thumbnail Downloader (HD)</div>
+  <input type="text" id="thumbInput" placeholder="YouTube video ka link yahan paste karo">
+  <button class="mini-btn" style="width:100%" onclick="getThumbnail()">🖼 Thumbnail Lao</button>
+  <img id="thumbImg" class="thumb-img" alt="thumbnail">
+  <div id="thumbBtns" style="margin-top:8px"></div>
+</div>
+
+<div class="card">
   <div class="card-label">📋 Log</div>
   <div class="log-box" id="logBox"><div class="log-line">⚡ ZUBI Downloader ready!</div></div>
 </div>
 
-<div class="footer">ZUBI DOWNLOADER • Apni ya copyright-free videos ke liye istemal karo</div>
+<div class="footer">ZUBI DOWNLOADER • Apni ya copyright-free videos ke liye istemal karo<br>Madad ke liye WhatsApp: +92 317 7843735</div>
+
+<a class="wa-float" id="waFloat" href="#" target="_blank" rel="noopener">💬 WhatsApp</a>
 
 <script>
+// ── CONFIG ──
+const WA_NUMBER='923177843735';
+function waLink(text){return 'https://wa.me/'+WA_NUMBER+'?text='+encodeURIComponent(text);}
+document.getElementById('waFloat').href=waLink('Assalamualaikum! Mujhe video download karni hai, madad kar dein.');
+
 // APK (WebView) detect karo — wahan blob download kaam nahi karta
 function isAppMode(){
   const ua=navigator.userAgent||'';
   return /\bwv\b/i.test(ua)||/WebView/i.test(ua)||window.AndroidBridge!==undefined;
 }
-// App mein khulne par tip dikhao
 window.addEventListener('DOMContentLoaded',()=>{
   if(isAppMode()){
     const n=document.createElement('div');
@@ -107,7 +174,7 @@ function detectPlatform(url){
   if(u.includes('instagram.com')||u.includes('instagr.am'))return'instagram';
   if(u.includes('facebook.com')||u.includes('fb.watch')||u.includes('fb.com'))return'facebook';
   if(u.includes('youtube.com')||u.includes('youtu.be'))return'youtube';
-  if(u.includes('xiaohongshu.com')||u.includes('xhslink.com'))return'rednote';
+  if(u.includes('xiaohongshu.com')||u.includes('xhslink.com')||u.includes('xiaohongshu.cn'))return'rednote';
   return'unknown';
 }
 const platName={tiktok:'TikTok',instagram:'Instagram',facebook:'Facebook',youtube:'YouTube',rednote:'RedNote',unknown:'Unknown'};
@@ -169,17 +236,73 @@ async function resolveFacebook(url){
   }catch(e){}
   throw new Error('Facebook API fail');
 }
+// ── YOUTUBE (cobalt v7 public instance — bina auth) ──
+async function resolveYouTube(url){
+  try{
+    const r=await fetch('https://downloadapi.stuff.solutions/api/json',{method:'POST',
+      headers:{'Accept':'application/json','Content-Type':'application/json'},
+      body:JSON.stringify({url:url,vQuality:'720',filenamePattern:'basic',isAudioOnly:false})});
+    const d=await r.json();
+    if((d.status==='stream'||d.status==='redirect')&&d.url)return{url:d.url,title:''};
+    if(d.status==='picker'&&Array.isArray(d.picker)){
+      const v=d.picker.find(p=>p.type==='video'&&p.url)||d.picker[0];
+      if(v&&v.url)return{url:v.url,title:''};
+    }
+  }catch(e){}
+  const err=new Error('YouTube auto download fail — WhatsApp wala rasta use karo 👇');
+  err.whatsapp=true;
+  throw err;
+}
+// ── REDNOTE (page se direct video nikalne ki koshish, warna WhatsApp) ──
+async function resolveRedNote(url){
+  try{
+    const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url));
+    if(r.ok){
+      const t=await r.text();
+      const clean=s=>s.replace(/\\u002F/g,'/').replace(/\\\//g,'/').replace(/&amp;/g,'&');
+      let m=t.match(/property="og:video[^"]*" content="([^"]+)"/)||t.match(/"masterUrl"\s*:\s*"([^"]+)"/)||t.match(/"(https:[^"]*sns-video[^"]*)"/);
+      if(m&&m[1])return{url:clean(m[1]),title:''};
+    }
+  }catch(e){}
+  const err=new Error('RedNote auto download fail — WhatsApp wala rasta use karo 👇');
+  err.whatsapp=true;
+  throw err;
+}
 
 async function resolveOne(url){
   const p=detectPlatform(url);
   if(p==='tiktok')return{platform:p,...await resolveTikTok(url)};
   if(p==='instagram')return{platform:p,...await resolveInstagram(url)};
   if(p==='facebook')return{platform:p,...await resolveFacebook(url)};
-  if(p==='youtube')throw new Error('YouTube: chat mein link bhejo 📩');
-  if(p==='rednote')throw new Error('RedNote: chat mein link bhejo 📩');
-  throw new Error('Platform pehchana nahi gaya');
+  if(p==='youtube')return{platform:p,...await resolveYouTube(url)};
+  if(p==='rednote')return{platform:p,...await resolveRedNote(url)};
+  const err=new Error('Platform pehchana nahi gaya — WhatsApp par link bhej do 👇');
+  err.whatsapp=true;
+  throw err;
 }
 
+// ── Chat text se saare links nikalo ──
+function extractLinks(){
+  const ta=document.getElementById('urlInput');
+  const found=(ta.value.match(/https?:\/\/[^\s<>"')]+/g)||[])
+    .map(u=>u.replace(/[.,;!?]+$/,''))
+    .filter(u=>detectPlatform(u)!=='unknown');
+  const uniq=[...new Set(found)].slice(0,10);
+  if(!uniq.length){alert('Koi video link nahi mila! Pehle chat text ya links paste karo.');return;}
+  ta.value=uniq.join('\n');
+  log(`🧹 ${uniq.length} links nikal liye gaye!`,'c-purple');
+}
+
+// ── Saare links WhatsApp par bhejo (manual service) ──
+function sendLinksWhatsApp(){
+  const raw=document.getElementById('urlInput').value.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,10);
+  if(!raw.length){alert('Pehle links paste karo!');return;}
+  const msg='Assalamualaikum! Mujhe ye videos download karke bhej dein:\n'+raw.map((u,i)=>(i+1)+'. '+u).join('\n');
+  window.open(waLink(msg),'_blank');
+}
+</script>
+
+<script>
 function makeItem(url, platform){
   const div=document.createElement('div');
   div.className='item show';
@@ -212,13 +335,16 @@ async function startBulk(){
       st.innerHTML=`<span class="c-green">✅ Video ready!</span><br><button class="save-btn" data-idx="${idx}" data-fname="${fname}" onclick="downloadOne(this)">💾 DOWNLOAD</button>`;
       log(`✅ [${i+1}] ready — DOWNLOAD dabao`,'c-green');
     }catch(e){
-      st.innerHTML=`<span class="c-red">❌ ${e.message}</span>`;
+      let html=`<span class="c-red">❌ ${e.message}</span>`;
+      if(e.whatsapp){
+        html+=`<br><a class="wa-btn" target="_blank" rel="noopener" href="${waLink('Assalamualaikum! Mujhe ye video download karke bhej dein:\n'+url)}">💬 WhatsApp Par Bhejo — Download Karwana Hai</a>`;
+      }
+      st.innerHTML=html;
       log(`❌ [${i+1}] ${e.message}`,'c-red');
     }
   }
   if(resolved.length){
     if(isAppMode()){
-      // APK mein ZIP kaam nahi karta (WebView blob support nahi) — sirf alag alag download
       document.getElementById('zipBtn').style.display='none';
       document.getElementById('allBtn').style.display='block';
       document.getElementById('allBtn').textContent=`⬇ ${resolved.length} VIDEOS DOWNLOAD KARO`;
@@ -253,14 +379,11 @@ async function fetchVideoBlob(url){
   throw new Error('blocked');
 }
 
-// ek video direct download karo (blob se — open nahi hogi)
 async function downloadOne(btn){
   const idx=parseInt(btn.dataset.idx);
   const fname=btn.dataset.fname;
   const v=resolved[idx];
   if(!v)return;
-
-  // ── APK/WebView mode: seedha system download manager ko do ──
   if(isAppMode()){
     log(`📲 App mode: "${fname}" system download mein bhej raha…`);
     const a=document.createElement('a');
@@ -271,8 +394,6 @@ async function downloadOne(btn){
     log('📲 Notifications panel check karo — download wahan hogi','c-green');
     return;
   }
-
-  // ── Browser mode: blob se (download attribute kaam karega) ──
   const orig=btn.textContent;
   btn.disabled=true;btn.textContent='⏳ Download ho raha…';
   log(`⬇ "${fname}" download ho raha…`);
@@ -320,10 +441,8 @@ async function downloadZip(){
   btn.disabled=false;btn.textContent='📦 ZIP MEIN DOWNLOAD KARO';
 }
 
-// sab videos alag alag DIRECT download karo
 async function downloadAllSeparate(){
   if(!resolved.length)return;
-  // ── APK mode: seedhe links system download manager ko ──
   if(isAppMode()){
     log(`📲 App mode: ${resolved.length} videos system download mein bhej raha…`,'c-purple');
     resolved.forEach((v,i)=>{
@@ -337,7 +456,6 @@ async function downloadAllSeparate(){
     });
     return;
   }
-  // ── Browser mode: blob se ──
   log(`⬇ ${resolved.length} videos download ho rahi… ek ek karke`,'c-purple');
   for(let i=0;i<resolved.length;i++){
     const v=resolved[i];
@@ -357,6 +475,148 @@ async function downloadAllSeparate(){
     }
   }
   log('🏁 Sab complete!','c-purple');
+}
+</script>
+
+<script>
+// ─────────── FACEBOOK BULK UPLOAD (Graph API) ───────────
+const GRAPH='https://graph.facebook.com/v21.0';
+let fbMode='files';
+function fbTab(which){
+  fbMode=which;
+  document.getElementById('tabFiles').classList.toggle('active',which==='files');
+  document.getElementById('tabUrls').classList.toggle('active',which==='urls');
+  document.getElementById('fbFilesBox').style.display=which==='files'?'block':'none';
+  document.getElementById('fbUrlsBox').style.display=which==='urls'?'block':'none';
+}
+function fbCreds(){
+  return{page:document.getElementById('fbPageId').value.trim(),
+         token:document.getElementById('fbToken').value.trim()};
+}
+function fbSay(html){document.getElementById('fbPageInfo').innerHTML=html;}
+async function checkFbPage(){
+  const{page,token}=fbCreds();
+  if(!page||!token){fbSay('<span class="c-red">❌ Pehle Page ID aur Token dono likho</span>');return;}
+  fbSay('<span class="spin"></span>Check ho raha…');
+  try{
+    const r=await fetch(`${GRAPH}/${page}?fields=name,fan_count&access_token=${encodeURIComponent(token)}`);
+    const d=await r.json();
+    if(d.name)fbSay(`<span class="c-green">✅ Page mil gaya: <b>${d.name}</b>${d.fan_count?` (${d.fan_count} followers)`:''} — upload ke liye ready!</span>`);
+    else fbSay(`<span class="c-red">❌ ${d.error?d.error.message:'Page nahi mila — ID/Token check karo'}</span>`);
+  }catch(e){fbSay('<span class="c-red">❌ Network error — dobara try karo</span>');}
+}
+document.getElementById('fbFiles').addEventListener('change',e=>{
+  const list=document.getElementById('fbFileList');
+  list.innerHTML='';
+  [...e.target.files].forEach((f,i)=>{
+    const row=document.createElement('div');
+    row.className='up-row';
+    row.innerHTML=`🎬 <b>${f.name}</b> <span style="color:#8a8aa3">(${(f.size/1048576).toFixed(1)} MB)</span><input type="text" id="fbTitle_${i}" placeholder="Video ka title" value="${f.name.replace(/\.[^.]+$/,'').replace(/"/g,'')}" style="margin-top:6px">`;
+    list.appendChild(row);
+  });
+  if(e.target.files.length)log(`📁 ${e.target.files.length} files FB upload ke liye select ho gayin`,'c-purple');
+});
+function xhrPost(url,fd,onprog){
+  return new Promise((res,rej)=>{
+    const x=new XMLHttpRequest();
+    x.open('POST',url);
+    x.upload.onprogress=e=>{if(e.lengthComputable&&onprog)onprog(Math.round(e.loaded/e.total*100));};
+    x.onload=()=>{try{res(JSON.parse(x.responseText));}catch(err){rej(new Error('Server jawab samajh nahi aaya'));}};
+    x.onerror=()=>rej(new Error('Network error'));
+    x.send(fd);
+  });
+}
+async function startFbUpload(){
+  const{page,token}=fbCreds();
+  if(!page||!token){alert('Pehle Page ID aur Page Access Token likho!');return;}
+  const desc=document.getElementById('fbDesc').value.trim();
+  let items=[];
+  if(fbMode==='files'){
+    const files=[...document.getElementById('fbFiles').files];
+    if(!files.length){alert('Pehle video files select karo!');return;}
+    items=files.map((f,i)=>({file:f,title:document.getElementById('fbTitle_'+i)?.value.trim()||f.name}));
+  }else{
+    const urls=document.getElementById('fbUrls').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    if(!urls.length){alert('Pehle video URLs paste karo!');return;}
+    items=urls.map(u=>({fileUrl:u,title:''}));
+  }
+  const btn=document.getElementById('fbUpBtn');
+  const logBox=document.getElementById('fbLog');
+  btn.disabled=true;btn.textContent='⏳ UPLOAD HO RAHA…';
+  logBox.innerHTML='';
+  log(`📤 FB bulk upload shuru: ${items.length} videos → Page ${page}`,'c-purple');
+  let ok=0;
+  for(let i=0;i<items.length;i++){
+    const it=items[i];
+    const row=document.createElement('div');
+    row.className='up-row';
+    row.innerHTML=`[${i+1}/${items.length}] <b>${(it.title||it.fileUrl||'').substring(0,50)}</b><div class="item-status"><span class="spin"></span>Upload ho raha…</div><div class="progress"><div></div></div>`;
+    logBox.appendChild(row);
+    const st=row.querySelector('.item-status');
+    const bar=row.querySelector('.progress');const fill=bar.querySelector('div');
+    const fd=new FormData();
+    fd.append('access_token',token);
+    fd.append('published','true');
+    if(it.title)fd.append('title',it.title);
+    if(desc)fd.append('description',desc);
+    try{
+      let d;
+      if(it.file){
+        fd.append('source',it.file);
+        bar.style.display='block';
+        d=await xhrPost(`${GRAPH}/${page}/videos`,fd,p=>{fill.style.width=p+'%';st.innerHTML=`<span class="spin"></span>Upload ho raha… ${p}%`;});
+      }else{
+        fd.append('file_url',it.fileUrl);
+        d=await xhrPost(`${GRAPH}/${page}/videos`,fd,null);
+      }
+      if(d&&d.id){
+        ok++;
+        st.innerHTML=`<span class="c-green">✅ Upload ho gayi!</span> <a href="https://www.facebook.com/watch/?v=${d.id}" target="_blank" rel="noopener" style="color:#60a5fa">Video dekho</a>`;
+        log(`✅ FB [${i+1}] upload — ID ${d.id}`,'c-green');
+      }else{
+        st.innerHTML=`<span class="c-red">❌ ${d&&d.error?d.error.message:'Fail ho gaya'}</span>`;
+        log(`❌ FB [${i+1}] ${d&&d.error?d.error.message:'fail'}`,'c-red');
+      }
+    }catch(e){
+      st.innerHTML=`<span class="c-red">❌ ${e.message}</span>`;
+      log(`❌ FB [${i+1}] ${e.message}`,'c-red');
+    }
+  }
+  btn.disabled=false;btn.textContent='📤 PAGE PAR BULK UPLOAD KARO';
+  log(`🏁 FB upload done: ${ok}/${items.length}`,'c-purple');
+}
+
+// ─────────── YOUTUBE THUMBNAIL DOWNLOADER ───────────
+function ytId(u){
+  const m=u.match(/(?:youtube\.com\/(?:watch\?[^#]*v=|shorts\/|embed\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m?m[1]:null;
+}
+function getThumbnail(){
+  const u=document.getElementById('thumbInput').value.trim();
+  const id=ytId(u);
+  const img=document.getElementById('thumbImg');
+  const btns=document.getElementById('thumbBtns');
+  if(!id){alert('Sahi YouTube link paste karo!');return;}
+  const max=`https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
+  const hq=`https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+  const sd=`https://i.ytimg.com/vi/${id}/sddefault.jpg`;
+  img.onload=()=>{ if(img.naturalWidth<=200){img.src=hq;} img.style.display='block'; };
+  img.src=max;
+  btns.innerHTML=
+    `<button class="save-btn" onclick="dlThumb('${max}','HD')">💾 HD (1280×720)</button> `+
+    `<button class="save-btn" onclick="dlThumb('${sd}','SD')">💾 SD (640×480)</button> `+
+    `<button class="save-btn" onclick="dlThumb('${hq}','HQ')">💾 HQ (480×360)</button>`;
+  log('🖼 Thumbnail ready — neeche se download karo','c-green');
+}
+async function dlThumb(url,q){
+  try{
+    const r=await fetch(url);
+    const b=await r.blob();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(b);
+    a.download=`ZUBI_Thumbnail_${q}_${Date.now()}.jpg`;
+    document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),1000);
+  }catch(e){window.open(url,'_blank');}
 }
 </script>
 </body>
