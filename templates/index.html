@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ ZUBI DOWNLOADER — Professional Bulk Video Downloader</title>
+<link rel="stylesheet" href="/static/style.css">
+<!-- FontAwesome for WhatsApp Icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  /* Extra styling for tabs and WhatsApp button */
+  .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .tab-btn { flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-weight: bold; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+  .tab-btn.active { background: #7c3aed; border-color: #9333ea; }
+  .wa-float { position: fixed; bottom: 20px; right: 20px; background: #22c55e; color: #white; padding: 10px 18px; border-radius: 50px; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(34,197,94,0.4); z-index: 1000; text-decoration: none; }
+  .hidden-section { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="hero">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 15px;">
+      <div></div>
+      <!-- WhatsApp Header Button -->
+      <a href="https://wa.me/923177843735?text=Assalam%20o%20Alaikum!%20ZUBI%20DOWNLOADER%20help." target="_blank" style="background: #22c55e; color: white; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+        <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp Support
+      </a>
+    </div>
+
+    <h1><span class="bolt">⚡</span> <span class="zubi">ZUBI</span> DOWNLOADER</h1>
+    <p class="tagline">PROFESSIONAL BULK VIDEO DOWNLOADER & UPLOADER</p>
+    <div class="badges">
+      <span class="badge b-yt">▶ YouTube</span>
+      <span class="badge b-tt">♪ TikTok</span>
+      <span class="badge b-fb">f Facebook</span>
+      <span class="badge b-rn">RedNote</span>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="nav-tabs">
+    <button onclick="switchTab('downloader')" id="tab-dl" class="tab-btn active">📥 Bulk Downloader</button>
+    <button onclick="switchTab('uploader')" id="tab-up" class="tab-btn">📤 Bulk Uploader</button>
+  </div>
+
+  <!-- SECTION 1: DOWNLOADER -->
+  <div id="sec-downloader">
+    <div class="steps">
+      <div class="step"><b>1</b><span>Links paste karo<br><small>har line mein 1 link</small></span></div>
+      <div class="step"><b>2</b><span>Quality chuno<br><small>Best / HD / SD</small></span></div>
+      <div class="step"><b>3</b><span>Download dabao<br><small>sab videos ZIP mein</small></span></div>
+    </div>
+
+    <main class="card">
+      <label class="lbl" for="urls">🔗 Video Links <span class="muted">(max 10 — har line mein 1 link)</span></label>
+      <textarea id="urls" rows="6" placeholder="https://youtube.com/shorts/xxxx&#10;https://www.tiktok.com/@user/video/xxxx&#10;https://fb.watch/xxxx&#10;https://www.xiaohongshu.com/..."></textarea>
+      <div id="detect" class="detect">— links paste karte hi platform yahan show hogi —</div>
+
+      <div class="row">
+        <div class="quality">
+          <label class="lbl" for="quality">🎞️ Quality</label>
+          <select id="quality">
+            <option value="best">🌟 Best quality</option>
+            <option value="hd" selected>🎬 HD (720p)</option>
+            <option value="sd">📱 SD (480p) — fast</option>
+          </select>
+        </div>
+        <button id="dlBtn" class="bigbtn">⬇️ DOWNLOAD ALL</button>
+      </div>
+    </main>
+
+    <section id="progressCard" class="card hidden">
+      <label class="lbl">📊 Progress</label>
+      <div id="log" class="log"></div>
+      <a id="zipBtn" class="bigbtn hidden" href="#">📦 ZIP DOWNLOAD KARO</a>
+    </section>
+  </div>
+
+  <!-- SECTION 2: UPLOADER -->
+  <div id="sec-uploader" class="hidden-section">
+    <main class="card">
+      <label class="lbl">📤 Bulk Video Uploader</label>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">Apne phone ya PC se multiple videos select karein aur aik click par platforms par publish karein.</p>
+      
+      <div style="border: 2px dashed rgba(255,255,255,0.15); padding: 30px; text-align: center; border-radius: 12px; margin-bottom: 20px;">
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 32px; color: #a855f7; margin-bottom: 10px;"></i>
+        <p style="font-size: 14px; font-weight: bold;">Videos select karne ke liye yahan click karein</p>
+        <input type="file" multiple accept="video/*" style="margin-top: 10px;">
+      </div>
+
+      <button class="bigbtn" onclick="alert('Uploader queue initialized!')">🚀 START BULK UPLOAD</button>
+    </main>
+  </div>
+
+  <!-- Floating WhatsApp Button -->
+  <a href="https://wa.me/923177843735?text=Assalam%20o%20Alaikum!%20ZUBI%20DOWNLOADER%20help." target="_blank" class="wa-float">
+    <i class="fa-brands fa-whatsapp text-xl"></i> WhatsApp
+  </a>
+
+  <footer>⚡ ZUBI DOWNLOADER © 2026 &nbsp;•&nbsp; WhatsApp: <a href="https://wa.me/923177843735" target="_blank" style="color: #22c55e;">+92 317 7843735</a></footer>
+</div>
+
+<script>
+  function switchTab(tab) {
+    if(tab === 'downloader') {
+      document.getElementById('sec-downloader').style.display = 'block';
+      document.getElementById('sec-uploader').style.display = 'none';
+      document.getElementById('tab-dl').classList.add('active');
+      document.getElementById('tab-up').classList.remove('active');
+    } else {
+      document.getElementById('sec-downloader').style.display = 'none';
+      document.getElementById('sec-uploader').style.display = 'block';
+      document.getElementById('tab-up').classList.add('active');
+      document.getElementById('tab-dl').classList.remove('active');
+    }
+  }
+</script>
+<script src="/static/app.js"></script>
+</body>
+</html>
