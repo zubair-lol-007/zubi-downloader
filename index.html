@@ -9,84 +9,95 @@
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0B0B14;color:#fff;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;padding:14px;max-width:640px;margin:0 auto}
-.header{background:linear-gradient(135deg,#1A1A2E,#16213E);border-radius:18px;padding:22px 18px;text-align:center;margin-bottom:12px;border:1px solid #2a2a4a}
-.header h1{font-size:26px;font-weight:900;letter-spacing:1px}
-.zubi{color:#9F5FFB}.dl{color:#EC4899}
-.header p{color:#8a8aa3;font-size:12px;margin-top:6px}
-.badges{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
-.badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;background:#252540;color:#b8b8d0}
-.badge.ok{background:#123f2e;color:#10B981}
-.badge.blue{background:#12325f;color:#60a5fa}
-.card{background:#1A1A2E;border-radius:14px;padding:14px;margin-bottom:10px;border:1px solid #2a2a4a}
-.card-label{font-size:11px;color:#9F5FFB;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
-textarea{width:100%;min-height:110px;padding:12px;background:#252540;border:2px solid #333355;border-radius:11px;color:#fff;font-size:13px;outline:none;resize:vertical;font-family:inherit}
-textarea:focus{border-color:#9F5FFB}
-input[type=text],input[type=password]{width:100%;padding:11px;background:#252540;border:2px solid #333355;border-radius:11px;color:#fff;font-size:13px;outline:none;font-family:inherit;margin-bottom:8px}
-input:focus{border-color:#9F5FFB}
-.hint{font-size:11px;color:#64748B;margin-top:6px}
-.dl-btn{width:100%;padding:15px;background:linear-gradient(135deg,#7C3AED,#9F5FFB);border:none;border-radius:13px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px}
+body{background:#F4F5FB;color:#1E1E2E;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;padding:14px;max-width:640px;margin:0 auto}
+.header{background:linear-gradient(135deg,#6D28D9,#9333EA);border-radius:20px;padding:24px 18px;text-align:center;margin-bottom:14px;box-shadow:0 8px 24px rgba(109,40,217,.25)}
+.header h1{font-size:30px;font-weight:900;letter-spacing:.5px;color:#fff}
+.header h1 .zubi{color:#FDE68A}.dl{color:#fff}
+.header p{color:#E9D5FF;font-size:13px;margin-top:6px}
+.badges{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.badge{font-size:10px;font-weight:700;padding:5px 11px;border-radius:20px;background:rgba(255,255,255,.18);color:#fff}
+.badge.ok{background:rgba(16,185,129,.25)}
+.badge.blue{background:rgba(96,165,250,.3)}
+.card{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid #E7E8F0;box-shadow:0 2px 10px rgba(30,30,46,.05)}
+.card-label{font-size:11px;color:#7C3AED;font-weight:800;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+textarea{width:100%;min-height:110px;padding:12px;background:#F8F8FC;border:2px solid #E7E8F0;border-radius:12px;color:#1E1E2E;font-size:13px;outline:none;resize:vertical;font-family:inherit}
+textarea:focus{border-color:#7C3AED}
+input[type=text],input[type=password]{width:100%;padding:12px;background:#F8F8FC;border:2px solid #E7E8F0;border-radius:12px;color:#1E1E2E;font-size:13px;outline:none;font-family:inherit;margin-bottom:8px}
+input:focus{border-color:#7C3AED}
+.hint{font-size:11px;color:#71717A;margin-top:6px}
+.dl-btn{width:100%;padding:15px;background:linear-gradient(135deg,#7C3AED,#9333EA);border:none;border-radius:13px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 14px rgba(124,58,237,.3)}
 .dl-btn:disabled{opacity:.5;cursor:wait}
 .zip-btn{width:100%;padding:14px;background:linear-gradient(135deg,#059669,#10B981);border:none;border-radius:13px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px;display:none}
-.mini-btn{padding:10px 12px;background:#252540;border:1px solid #3a3a5f;border-radius:11px;color:#d5d5ea;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.mini-btn{padding:11px 12px;background:#F1F1F7;border:1px solid #E7E8F0;border-radius:11px;color:#3F3F56;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 .mini-row{display:flex;gap:8px;margin-bottom:10px}
 .mini-row .mini-btn{flex:1}
-.item{background:#141428;border:1px solid #2a2a4a;border-radius:11px;padding:10px 12px;margin-bottom:8px;display:none}
+.item{background:#F8F8FC;border:1px solid #E7E8F0;border-radius:12px;padding:10px 12px;margin-bottom:8px;display:none}
 .item.show{display:block}
 .item-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .plat{font-size:10px;font-weight:800;padding:3px 9px;border-radius:12px;text-transform:uppercase}
-.plat.tiktok{background:#111;color:#fff;border:1px solid #444}
+.plat.tiktok{background:#111;color:#fff}
 .plat.instagram{background:linear-gradient(135deg,#833ab4,#fd1d1d);color:#fff}
 .plat.facebook{background:#1877F2;color:#fff}
 .plat.youtube{background:#c00;color:#fff}
 .plat.rednote{background:#ff2442;color:#fff}
-.plat.unknown{background:#444;color:#ccc}
-.item-url{font-size:11px;color:#8a8aa3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.plat.unknown{background:#666;color:#fff}
+.item-url{font-size:11px;color:#71717A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
 .item-status{font-size:12px;margin:4px 0}
-.save-btn{display:inline-block;padding:9px 18px;background:linear-gradient(135deg,#059669,#10B981);color:#fff;font-size:13px;font-weight:800;border-radius:10px;text-decoration:none;margin-top:4px;border:none;cursor:pointer;font-family:inherit}
+.save-btn{display:inline-block;padding:12px 20px;background:linear-gradient(135deg,#059669,#10B981);color:#fff;font-size:14px;font-weight:800;border-radius:11px;text-decoration:none;margin-top:6px;border:none;cursor:pointer;font-family:inherit;box-shadow:0 4px 12px rgba(16,185,129,.3)}
 .save-btn:disabled{opacity:.6;cursor:wait}
-.wa-btn{display:inline-block;padding:9px 18px;background:#25D366;color:#07351a;font-size:13px;font-weight:800;border-radius:10px;text-decoration:none;margin-top:6px;border:none;cursor:pointer;font-family:inherit}
-.spin{display:inline-block;width:12px;height:12px;border:2px solid #9F5FFB;border-top-color:transparent;border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+.big-dl{width:100%;padding:16px;font-size:16px}
+.wa-btn{display:inline-block;padding:11px 18px;background:#25D366;color:#06351a;font-size:13px;font-weight:800;border-radius:11px;text-decoration:none;margin-top:6px;border:none;cursor:pointer;font-family:inherit}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid #7C3AED;border-top-color:transparent;border-radius:50%;animation:sp 0.8s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
-.log-box{background:#0d0d1a;border-radius:11px;padding:11px;max-height:150px;overflow-y:auto;font-size:11px;border:1px solid #1e1e3a;margin-bottom:10px}
-.log-line{padding:2px 0;border-bottom:1px solid #1a1a2e;color:#8a8aa3}
-.c-green{color:#10B981}.c-red{color:#EF4444}.c-yellow{color:#F59E0B}.c-purple{color:#9F5FFB}
-.footer{text-align:center;font-size:11px;color:#4a4a6a;padding:12px}
-.note{background:#2a1e0d;border:1px solid #5a3d1a;border-radius:11px;padding:10px 12px;font-size:11px;color:#d4a574;margin-bottom:10px}
-.note.green{background:#0d2a1a;border-color:#1a5a3d;color:#8fd4ae}
+.log-box{background:#F8F8FC;border-radius:12px;padding:11px;max-height:150px;overflow-y:auto;font-size:11px;border:1px solid #E7E8F0;margin-bottom:10px}
+.log-line{padding:2px 0;border-bottom:1px solid #EFEFF5;color:#71717A}
+.c-green{color:#059669}.c-red{color:#DC2626}.c-yellow{color:#D97706}.c-purple{color:#7C3AED}
+.footer{text-align:center;font-size:11px;color:#9CA3AF;padding:12px}
+.note{background:#FFFBEB;border:1px solid #FDE68A;border-radius:12px;padding:10px 12px;font-size:11px;color:#92400E;margin-bottom:10px}
+.note.green{background:#ECFDF5;border-color:#A7F3D0;color:#065F46}
 .wa-float{position:fixed;right:16px;bottom:16px;z-index:99;display:flex;align-items:center;gap:8px;background:#25D366;color:#06351a;font-weight:800;font-size:14px;padding:13px 18px;border-radius:40px;text-decoration:none;box-shadow:0 6px 20px rgba(37,211,102,.45)}
 .tabs{display:flex;gap:6px;margin-bottom:10px}
-.tab{flex:1;padding:9px;text-align:center;background:#252540;border:1px solid #3a3a5f;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;color:#b8b8d0}
+.tab{flex:1;padding:9px;text-align:center;background:#F1F1F7;border:1px solid #E7E8F0;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;color:#71717A}
 .tab.active{background:#1877F2;color:#fff;border-color:#1877F2}
-.progress{height:8px;background:#252540;border-radius:6px;overflow:hidden;margin-top:6px;display:none}
+.progress{height:8px;background:#E7E8F0;border-radius:6px;overflow:hidden;margin-top:6px;display:none}
 .progress div{height:100%;background:linear-gradient(90deg,#1877F2,#60a5fa);width:0%}
-.up-row{background:#141428;border:1px solid #2a2a4a;border-radius:11px;padding:10px 12px;margin-bottom:8px;font-size:12px}
-.thumb-img{width:100%;border-radius:11px;margin-top:8px;display:none}
-ol.steps{font-size:11px;color:#8a8aa3;margin:6px 0 6px 16px;line-height:1.7}
-.search{width:100%;padding:13px 14px;background:#252540;border:2px solid #333355;border-radius:13px;color:#fff;font-size:14px;outline:none;font-family:inherit;margin-bottom:10px}
-.search:focus{border-color:#9F5FFB}
+.up-row{background:#F8F8FC;border:1px solid #E7E8F0;border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:12px}
+.thumb-img{width:100%;border-radius:12px;margin-top:8px;display:none}
+ol.steps{font-size:11px;color:#71717A;margin:6px 0 6px 16px;line-height:1.7}
+.search{width:100%;padding:13px 14px;background:#fff;border:2px solid #E7E8F0;border-radius:13px;color:#1E1E2E;font-size:14px;outline:none;font-family:inherit;margin-bottom:10px;box-shadow:0 2px 8px rgba(30,30,46,.04)}
+.search:focus{border-color:#7C3AED}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.chip{padding:7px 13px;background:#252540;border:1px solid #3a3a5f;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;color:#b8b8d0}
-.chip.active{background:#9F5FFB;color:#fff;border-color:#9F5FFB}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.tcard{background:#1A1A2E;border:1px solid #2a2a4a;border-radius:14px;padding:12px;cursor:pointer;text-align:left}
-.tcard:active{border-color:#9F5FFB}
-.tcard .ic{font-size:22px}
-.tcard .nm{font-size:13px;font-weight:800;margin-top:4px}
-.tcard .ds{font-size:10px;color:#8a8aa3;margin-top:2px;line-height:1.4}
-.panel-title{font-size:16px;font-weight:800;margin-bottom:10px}
+.chip{padding:7px 13px;background:#fff;border:1px solid #E7E8F0;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;color:#71717A}
+.chip.active{background:#7C3AED;color:#fff;border-color:#7C3AED}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.tcard{background:#fff;border:1px solid #E7E8F0;border-radius:16px;padding:14px;cursor:pointer;text-align:left;box-shadow:0 2px 8px rgba(30,30,46,.04)}
+.tcard:active{border-color:#7C3AED}
+.tcard .ic{font-size:24px}
+.tcard .nm{font-size:13px;font-weight:800;margin-top:5px;color:#1E1E2E}
+.tcard .ds{font-size:10px;color:#71717A;margin-top:2px;line-height:1.4}
+.panel-title{font-size:18px;font-weight:800;margin-bottom:4px;color:#1E1E2E}
+.panel-sub{font-size:12px;color:#71717A;margin-bottom:12px;line-height:1.5}
 .tool-out{margin-top:10px}
-.tool-out img,.tool-out canvas{max-width:100%;border-radius:11px;margin-top:8px}
-select{width:100%;padding:11px;background:#252540;border:2px solid #333355;border-radius:11px;color:#fff;font-size:13px;outline:none;font-family:inherit;margin-bottom:8px}
+.tool-out img,.tool-out canvas{max-width:100%;border-radius:12px;margin-top:8px}
+select{width:100%;padding:12px;background:#F8F8FC;border:2px solid #E7E8F0;border-radius:12px;color:#1E1E2E;font-size:13px;outline:none;font-family:inherit;margin-bottom:8px}
 input[type=range]{width:100%;margin-bottom:8px}
-.lbl{font-size:11px;color:#9F5FFB;font-weight:700;margin-bottom:4px}
-.honest{font-size:10px;color:#64748B;margin-top:4px}
+.lbl{font-size:11px;color:#7C3AED;font-weight:700;margin-bottom:4px}
+.honest{font-size:10px;color:#9CA3AF;margin-top:4px}
+.backbar{display:none;align-items:center;gap:8px;margin-bottom:12px}
+.backbar.show{display:flex}
+.backbar button{padding:10px 16px;background:#1E1E2E;color:#fff;border:none;border-radius:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
+.backbar span{font-size:13px;font-weight:700;color:#71717A}
+.result-banner{display:none;background:#ECFDF5;border:2px solid #10B981;border-radius:13px;padding:13px;margin-bottom:10px;font-size:14px;font-weight:800;color:#065F46;text-align:center}
+.result-banner.show{display:block}
+body.tool-open .grid,body.tool-open #toolSearch,body.tool-open #chips,body.tool-open .note{display:none}
+body.tool-open .card.tool-panel{display:none}
+body.tool-open .card.tool-panel.active{display:block}
 </style>
 </head>
 <body>
@@ -142,9 +153,13 @@ input[type=range]{width:100%;margin-bottom:8px}
   <div class="tcard" data-cat="more" data-name="internet speed checker" onclick="goPanel('panel-speed')"><div class="ic">🚀</div><div class="nm">Internet Speed Checker</div><div class="ds">Download / Upload speed + ping check karo</div></div>
 </div>
 
-<div class="note">📌 <b>YouTube / RedNote:</b> pehle auto download try hoga. Agar koi mushkil link fail ho jaye to us video ke neeche <b>WhatsApp wala button</b> ayega — wahan link bhejo, download karke wapas bhej diya jayega! 💬</div>
+<div class="note">📌 <b>YouTube / RedNote:</b> pehle auto download try hoga. Agar koi mushkil link fail ho jaye to us video ke neeche <b>WhatsApp wala button</b> ayega — wahan link bhejo, download karke wapas bhej diya jayega! 💬  <div class="tcard" data-cat="dl" data-name="youtube thumbnail downloader" onclick="goPanel('panel-thumb')"><div class="ic">🖼️</div><div class="nm">YouTube Thumbnail Downloader</div><div class="ds">Kisi bhi YouTube video ka HD thumbnail lo</div></div>
+</div>
 
-<div class="card" id="panel-downloader">
+<div class="backbar" id="backbar"><button onclick="goHome()">← Sab Tools</button><span id="backbarName">Tool</span></div>
+<div class="result-banner" id="resultBanner">✅ Tayyar! Download button neeche hai 👇</div>
+
+<div class="card tool-panel" id="panel-downloader">
   <div class="card-label">📎 Video Links (ek line mein ek — max 10)</div>
   <textarea id="urlInput" placeholder="https://www.tiktok.com/@...&#10;https://www.youtube.com/watch?v=...&#10;https://www.instagram.com/reel/...&#10;https://www.facebook.com/...&#10;http://xhslink.com/..."></textarea>
   <div class="hint">TikTok, Instagram, Facebook, YouTube ya RedNote ke links paste karo — ya poora chat text paste karke neeche wala "Links Nikalo" dabao</div>
@@ -161,7 +176,7 @@ input[type=range]{width:100%;margin-bottom:8px}
 
 <div id="items"></div>
 
-<div class="card" id="panel-fbupload">
+<div class="card tool-panel" id="panel-fbupload">
   <div class="card-label">📘 Facebook Bulk Upload — Page Par Videos</div>
   <div class="hint" style="margin:0 0 8px">Apne Facebook Page par ek saath bohat si videos upload karo — bilkul free. Token sirf tumhare browser mein rehta hai, kahin save ya send nahi hota 🔒</div>
   <input type="text" id="fbPageId" placeholder="Page ID (masalan 123456789012345)">
@@ -192,7 +207,7 @@ input[type=range]{width:100%;margin-bottom:8px}
   </div>
 </div>
 
-<div class="card">
+<div class="card tool-panel" id="panel-thumb">
   <div class="card-label">🖼 YouTube Thumbnail Downloader (HD)</div>
   <input type="text" id="thumbInput" placeholder="YouTube video ka link yahan paste karo">
   <button class="mini-btn" style="width:100%" onclick="getThumbnail()">🖼 Thumbnail Lao</button>
@@ -200,13 +215,13 @@ input[type=range]{width:100%;margin-bottom:8px}
   <div id="thumbBtns" style="margin-top:8px"></div>
 </div>
 
-<div class="card">
+<div class="card tool-panel">
   <div class="card-label">📋 Log</div>
   <div class="log-box" id="logBox"><div class="log-line">⚡ ZUBI Downloader ready!</div></div>
 </div>
 
 <!-- ── IMAGE TOOLS ── -->
-<div class="card" id="panel-img-enhance"><div class="panel-title">✨ Image Enhancer</div>
+<div class="card tool-panel" id="panel-img-enhance"><div class="panel-title">✨ Image Enhancer</div>
 <input type="file" id="ieFile" accept="image/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <div class="lbl">Brightness: <span id="ieBVal">100%</span></div><input type="range" id="ieB" min="0" max="200" value="100" oninput="document.getElementById('ieBVal').textContent=this.value+'%'">
 <div class="lbl">Contrast: <span id="ieCVal">100%</span></div><input type="range" id="ieC" min="0" max="200" value="100" oninput="document.getElementById('ieCVal').textContent=this.value+'%'">
@@ -214,55 +229,55 @@ input[type=range]{width:100%;margin-bottom:8px}
 <div class="lbl">Sharpness: <span id="ieShVal">0</span></div><input type="range" id="ieSh" min="0" max="100" value="0" oninput="document.getElementById('ieShVal').textContent=this.value">
 <button class="dl-btn" onclick="imgEnhance()">✨ Enhance Karo</button><div class="tool-out" id="out-ie"></div></div>
 
-<div class="card" id="panel-img-upscale"><div class="panel-title">🔍 Image Upscaler</div>
+<div class="card tool-panel" id="panel-img-upscale"><div class="panel-title">🔍 Image Upscaler</div>
 <input type="file" id="iuFile" accept="image/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <select id="iuScale"><option value="2">2x bara</option><option value="4">4x bara</option></select>
 <button class="dl-btn" onclick="imgUpscale()">🔍 Upscale Karo</button>
 <div class="honest">Note: ye browser-quality upscale hai (AI upscale nahi) — photo bari hogi, magar detail AI jaisi nahi banegi.</div><div class="tool-out" id="out-iu"></div></div>
 
-<div class="card" id="panel-img-format"><div class="panel-title">🔄 Image Format Changer</div>
+<div class="card tool-panel" id="panel-img-format"><div class="panel-title">🔄 Image Format Changer</div>
 <input type="file" id="ifFile" accept="image/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <select id="ifFmt"><option value="image/png">PNG</option><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option></select>
 <div class="lbl">Quality (JPG/WebP): <span id="ifQVal">92%</span></div><input type="range" id="ifQ" min="50" max="100" value="92" oninput="document.getElementById('ifQVal').textContent=this.value+'%'">
 <button class="dl-btn" onclick="imgFormat()">🔄 Format Badlo</button><div class="tool-out" id="out-if"></div></div>
 
-<div class="card" id="panel-img-pdf"><div class="panel-title">🖼️ Images To PDF</div>
+<div class="card tool-panel" id="panel-img-pdf"><div class="panel-title">🖼️ Images To PDF</div>
 <input type="file" id="ipFiles" accept="image/*" multiple style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <div class="hint" style="margin-bottom:8px">Ek se zyada photos select karo — har photo ek page banegi.</div>
 <button class="dl-btn" onclick="imgsToPdf()">📄 PDF Banao</button><div class="tool-out" id="out-ip"></div></div>
 
-<div class="card" id="panel-img-resize"><div class="panel-title">📐 Image Resizer</div>
+<div class="card tool-panel" id="panel-img-resize"><div class="panel-title">📐 Image Resizer</div>
 <input type="file" id="irFile" accept="image/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <input type="text" id="irW" placeholder="Chaurai (width) — pixels, masalan 1080">
 <input type="text" id="irH" placeholder="Unchai (height) — pixels, masalan 1080">
 <label style="font-size:12px;color:#b8b8d0"><input type="checkbox" id="irKeep" checked> Aspect ratio barkarar rakho</label>
 <button class="dl-btn" style="margin-top:8px" onclick="imgResize()">📐 Resize Karo</button><div class="tool-out" id="out-ir"></div></div>
 
-<div class="card" id="panel-img-bg"><div class="panel-title">🪄 Image Background Remover</div>
+<div class="card tool-panel" id="panel-img-bg"><div class="panel-title">🪄 Image Background Remover</div>
 <input type="file" id="bgFile" accept="image/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <button class="dl-btn" onclick="imgBgRemove()">🪄 Background Hatayo</button>
 <div class="honest">Pehli dafa AI model download hoga (~40MB) — thoda waqt lagega, phir sab kuch phone par hi hoga, photo kahin upload nahi hogi.</div><div class="tool-out" id="out-bg"></div></div>
 
-<div class="card" id="panel-img-ocr"><div class="panel-title">🔤 Image To Text (OCR)</div>
+<div class="card tool-panel" id="panel-img-ocr"><div class="panel-title">🔤 Image To Text (OCR)</div>
 <input type="file" id="ocrFile" accept="image/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <select id="ocrLang"><option value="eng">English</option><option value="urd">Urdu</option><option value="eng+urd">English + Urdu</option></select>
 <button class="dl-btn" onclick="imgOcr()">🔤 Text Nikalo</button>
 <textarea id="ocrOut" style="min-height:90px;margin-top:8px" placeholder="Yahan text ayega…"></textarea>
 <button class="mini-btn" style="width:100%" onclick="copyText('ocrOut')">📋 Text Copy Karo</button></div>
 
-<div class="card" id="panel-img-crop"><div class="panel-title">✂️ Aspect Ratio Crop</div>
+<div class="card tool-panel" id="panel-img-crop"><div class="panel-title">✂️ Aspect Ratio Crop</div>
 <input type="file" id="icFile" accept="image/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <select id="icRatio"><option value="1">1:1 (Square)</option><option value="0.8">4:5 (Portrait post)</option><option value="0.5625">9:16 (Reels/Story)</option><option value="1.7778">16:9 (YouTube)</option><option value="1.5">3:2</option><option value="0.75">3:4</option></select>
 <button class="dl-btn" onclick="imgCrop()">✂️ Crop Karo</button><div class="tool-out" id="out-ic"></div></div>
 
 <!-- ── VIDEO TOOLS (ffmpeg browser engine) ── -->
-<div class="card" id="panel-vid-upscale"><div class="panel-title">📈 Video Upscaler</div>
+<div class="card tool-panel" id="panel-vid-upscale"><div class="panel-title">📈 Video Upscaler</div>
 <input type="file" id="vuFile" accept="video/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <select id="vuRes"><option value="1280:720">720p HD</option><option value="1920:1080">1080p Full HD</option></select>
 <button class="dl-btn" onclick="vidUpscale()">📈 Upscale Karo</button>
 <div class="honest">Video phone par hi process hogi (koi upload nahi) — pehli dafa engine load hoga, bari video par waqt lag sakta hai.</div><div class="tool-out" id="out-vu"></div></div>
 
-<div class="card" id="panel-vid-enhance"><div class="panel-title">🎨 Video Enhancer</div>
+<div class="card tool-panel" id="panel-vid-enhance"><div class="panel-title">🎨 Video Enhancer</div>
 <input type="file" id="veFile" accept="video/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <div class="lbl">Brightness: <span id="veBVal">0</span></div><input type="range" id="veB" min="-0.5" max="0.5" step="0.05" value="0" oninput="document.getElementById('veBVal').textContent=this.value">
 <div class="lbl">Contrast: <span id="veCVal">1</span></div><input type="range" id="veC" min="0.5" max="2" step="0.1" value="1" oninput="document.getElementById('veCVal').textContent=this.value">
@@ -270,18 +285,18 @@ input[type=range]{width:100%;margin-bottom:8px}
 <div class="lbl">Sharpness: <span id="veShVal">0</span></div><input type="range" id="veSh" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('veShVal').textContent=this.value">
 <button class="dl-btn" onclick="vidEnhance()">🎨 Enhance Karo</button><div class="tool-out" id="out-ve"></div></div>
 
-<div class="card" id="panel-vid-mp3"><div class="panel-title">🎵 Video To MP3</div>
+<div class="card tool-panel" id="panel-vid-mp3"><div class="panel-title">🎵 Video To MP3</div>
 <input type="file" id="vmFile" accept="video/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <button class="dl-btn" onclick="vidToMp3()">🎵 MP3 Nikalo</button><div class="tool-out" id="out-vm"></div></div>
 
-<div class="card" id="panel-vid-reels"><div class="panel-title">📱 Video To Reels</div>
+<div class="card tool-panel" id="panel-vid-reels"><div class="panel-title">📱 Video To Reels</div>
 <input type="file" id="vrFile" accept="video/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <label style="font-size:12px;color:#b8b8d0"><input type="checkbox" id="vrTrim" checked> 90 second tak trim karo (Reels limit)</label>
 <div class="hint" style="margin:4px 0 8px">Video ko 9:16 vertical banaya jayega — kinare blur background ke saath, taake poori video nazar aaye.</div>
 <button class="dl-btn" onclick="vidToReels()">📱 Reels Banao</button><div class="tool-out" id="out-vr"></div></div>
 
 <!-- ── PDF TOOLS ── -->
-<div class="card" id="panel-pdf-editor"><div class="panel-title">✏️ PDF Editor</div>
+<div class="card tool-panel" id="panel-pdf-editor"><div class="panel-title">✏️ PDF Editor</div>
 <input type="file" id="peFile" accept="application/pdf" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <button class="mini-btn" style="width:100%;margin-bottom:8px" onclick="pdfEditorLoad()">📄 PDF Khol Kar Pages Dikhao</button>
 <div id="pePages"></div>
@@ -289,57 +304,65 @@ input[type=range]{width:100%;margin-bottom:8px}
 <input type="text" id="pePage" placeholder="Kis page number par? (masalan 1)">
 <button class="dl-btn" style="margin-top:8px" onclick="pdfEditorSave()">💾 Edited PDF Download Karo</button><div class="tool-out" id="out-pe"></div></div>
 
-<div class="card" id="panel-pdf-word"><div class="panel-title">📝 PDF To Word</div>
+<div class="card tool-panel" id="panel-pdf-word"><div class="panel-title">📝 PDF To Word</div>
 <input type="file" id="pwFile" accept="application/pdf" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <button class="dl-btn" onclick="pdfToWord()">📝 Word File Banao</button>
 <div class="honest">Text-based conversion hai — PDF ka likha hua text Word mein ayega, design/layout waisa ka waisa nahi rahega.</div><div class="tool-out" id="out-pw"></div></div>
 
-<div class="card" id="panel-word-pdf"><div class="panel-title">📄 Word To PDF</div>
+<div class="card tool-panel" id="panel-word-pdf"><div class="panel-title">📄 Word To PDF</div>
 <input type="file" id="wpFile" accept=".docx" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <button class="dl-btn" onclick="wordToPdf()">📄 PDF Banao</button>
 <div class="honest">Text-based conversion hai — Word ka text PDF mein ayega.</div><div class="tool-out" id="out-wp"></div></div>
 
-<div class="card" id="panel-pdf-merge"><div class="panel-title">📚 Merge PDF</div>
+<div class="card tool-panel" id="panel-pdf-merge"><div class="panel-title">📚 Merge PDF</div>
 <input type="file" id="pmFiles" accept="application/pdf" multiple style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <div class="hint" style="margin-bottom:8px">2 ya zyada PDFs select karo — jis tarteeb mein select karoge, usi tarteeb mein jurengi.</div>
 <button class="dl-btn" onclick="pdfMerge()">📚 Merge Karo</button><div class="tool-out" id="out-pm"></div></div>
 
-<div class="card" id="panel-pdf-split"><div class="panel-title">✂️ Split PDF</div>
+<div class="card tool-panel" id="panel-pdf-split"><div class="panel-title">✂️ Split PDF</div>
 <input type="file" id="psFile" accept="application/pdf" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <select id="psMode"><option value="range">Chune hue pages (range)</option><option value="all">Har page alag PDF</option></select>
 <input type="text" id="psRange" placeholder="Masalan: 1-3,5  (sirf range mode mein)">
 <button class="dl-btn" onclick="pdfSplit()">✂️ Split Karo</button><div class="tool-out" id="out-ps"></div></div>
 
-<div class="card" id="panel-pdf-excel"><div class="panel-title">📊 PDF To Excel</div>
+<div class="card tool-panel" id="panel-pdf-excel"><div class="panel-title">📊 PDF To Excel</div>
 <input type="file" id="pxFile" accept="application/pdf" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <button class="dl-btn" onclick="pdfToExcel()">📊 Excel Banao</button>
 <div class="honest">Text-based conversion hai — PDF ki lines Excel ki rows banengi.</div><div class="tool-out" id="out-px"></div></div>
 
-<div class="card" id="panel-excel-pdf"><div class="panel-title">📈 Excel To PDF</div>
+<div class="card tool-panel" id="panel-excel-pdf"><div class="panel-title">📈 Excel To PDF</div>
 <input type="file" id="xpFile" accept=".xlsx,.xls,.csv" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
 <button class="dl-btn" onclick="excelToPdf()">📈 PDF Banao</button><div class="tool-out" id="out-xp"></div></div>
 
 <!-- ── MORE TOOLS ── -->
-<div class="card" id="panel-tts"><div class="panel-title">🗣️ Text To Speech</div>
+<div class="card tool-panel" id="panel-tts"><div class="panel-title">🗣️ Text To Speech</div>
 <textarea id="ttsText" placeholder="Yahan text likho — phir Play dabao, phone khud parh kar sunayega…"></textarea>
 <select id="ttsVoice"><option value="">Awaaz load ho rahi…</option></select>
 <div class="lbl">Speed: <span id="ttsRVal">1</span></div><input type="range" id="ttsRate" min="0.5" max="2" step="0.1" value="1" oninput="document.getElementById('ttsRVal').textContent=this.value">
 <div class="mini-row"><button class="mini-btn" onclick="ttsPlay()">▶️ Play</button><button class="mini-btn" onclick="ttsStop()">⏹️ Stop</button></div>
 <div class="honest">Awaazein aapke phone/browser par depend karti hain — Urdu awaaz har device par nahi hoti.</div></div>
 
-<div class="card" id="panel-qr"><div class="panel-title">🔲 QRCode Generator</div>
+<div class="card tool-panel" id="panel-qr"><div class="panel-title">🔲 QRCode Generator</div>
 <input type="text" id="qrText" placeholder="Link ya text likho — masalan https://example.com">
 <select id="qrSize"><option value="256">Medium (256px)</option><option value="512">Large (512px)</option><option value="128">Small (128px)</option></select>
 <button class="dl-btn" onclick="qrGen()">🔲 QR Code Banao</button><div class="tool-out" id="out-qr"></div></div>
 
-<div class="card" id="panel-web-apk"><div class="panel-title">📲 Website To App</div>
-<input type="text" id="waUrl" placeholder="Website ka link — masalan https://example.com">
-<div class="mini-row"><button class="mini-btn" onclick="webAppPack()">📦 App Pack Download Karo</button><button class="mini-btn" onclick="copyText('waUrl')">📋 Link Copy Karo</button></div>
-<div class="hint" style="margin:6px 0">Asli APK seedha browser mein nahi ban sakta — App Pack mein install files + guide milegi, aur neeche free APK builders ke links hain (5 minute ka kaam):</div>
-<div class="mini-row"><a class="mini-btn" style="text-align:center;text-decoration:none" href="https://webintoapp.com" target="_blank" rel="noopener">🌐 WebIntoApp</a><a class="mini-btn" style="text-align:center;text-decoration:none" href="https://appsgeyser.com" target="_blank" rel="noopener">🌐 AppsGeyser</a></div>
-<div class="tool-out" id="out-wa"></div></div>
+<div class="card tool-panel" id="panel-web-apk"><div class="panel-title">📲 Website To APK</div>
+<div class="panel-sub">Apni website ka premium Android app banao. Project ZIP milega — GitHub Actions se signed APK ban jayega, bilkul free. Koi "App not installed" error nahi.</div>
+<input type="text" id="apkUrl" placeholder="Website ka link — https://example.com" onblur="suggestPkg()">
+<input type="text" id="apkName" placeholder="App ka naam — masalan Meri Website">
+<input type="text" id="apkPkg" placeholder="Package name — masalan com.meriwebsite.app">
+<input type="text" id="apkVer" placeholder="Version — masalan 1.0" value="1.0">
+<div class="lbl">Theme color</div>
+<input type="color" id="apkColor" value="#7C3AED" style="width:100%;height:44px;padding:4px;margin-bottom:8px;border:2px solid #E7E8F0;border-radius:12px">
+<select id="apkOrient"><option value="portrait">Portrait (seedha)</option><option value="landscape">Landscape (ulta)</option><option value="fullSensor">Dono (auto rotate)</option></select>
+<label style="font-size:12px;color:#71717A"><input type="checkbox" id="apkFull"> Fullscreen (status/navigation bar chhupao)</label>
+<div style="margin:10px 0"><span class="lbl">App icon (square photo, optional): </span><input type="file" id="apkIcon" accept="image/*" style="color:#71717A;font-size:12px"></div>
+<button class="dl-btn" onclick="buildApkProject()">📲 Android Project ZIP Banao</button>
+<div class="tool-out" id="out-apk"></div>
+<div class="hint" id="apkSteps" style="display:none;line-height:1.8;margin-top:8px"></div></div>
 
-<div class="card" id="panel-speed"><div class="panel-title">🚀 Internet Speed Checker</div>
+<div class="card tool-panel" id="panel-speed"><div class="panel-title">🚀 Internet Speed Checker</div>
 <button class="dl-btn" onclick="speedTest()">🚀 Speed Check Karo</button>
 <div id="speedOut" style="font-size:14px;line-height:2"></div>
 <div class="honest">Download ke liye ~10MB test file, upload ke liye ~5MB data istemal hota hai.</div></div>
