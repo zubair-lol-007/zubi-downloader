@@ -58,7 +58,7 @@ function goHome(){
 function loadScript(src){
   return new Promise((res,rej)=>{
     if(document.querySelector('script[src="'+src+'"]')){res();return;}
-    const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('Script load fail: '+src));
+    const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>{s.remove();rej(new Error('Script load fail: '+src));};
     document.head.appendChild(s);
   });
 }
@@ -239,7 +239,7 @@ function downscaleBlob(file,maxDim){
 }
 async function imgBgRemove(){
   const f=fileOf('bgFile');if(!f)return;
-  const out='out-bg';outHtml(out,'<span class="spin"></span>AI model load ho raha… (pehli dafa ~40MB download hoga, WiFi behtar hai)');
+  const out='out-bg';outHtml(out,'<span class="spin"></span>AI model load ho raha… (pehli dafa ~55MB download hoga, WiFi behtar hai)');
   try{
     if(!bgMod){
       bgMod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');
@@ -248,7 +248,15 @@ async function imgBgRemove(){
     const small=await downscaleBlob(f,1024);
     outHtml(out,'<span class="spin"></span>Background hataya ja raha…');
     const blob=await Promise.race([
-      bgMod.removeBackground(small),
+      bgMod.removeBackground(small, {
+        publicPath: 'https://zubair-lol-007.github.io/zubi-downloader/bg-model/',
+        model: 'small',
+        progress: (key, current, total) => {
+          if (key.startsWith('fetch:')) {
+            outHtml(out, '<span class="spin"></span>AI model download ho raha… ' + Math.round(current/total*100) + '% (pehli dafa, WiFi behtar hai)');
+          }
+        }
+      }),
       new Promise((_,rej)=>setTimeout(()=>rej(new Error('MODEL_TIMEOUT')),120000))
     ]);
     const url=URL.createObjectURL(blob);
@@ -313,12 +321,16 @@ async function ensureFFmpeg(statusEl){
   if(ff) return ff;
   if(ffLoading) return ffLoading;
   ffLoading=(async()=>{
-    if(!window.FFmpeg){
-      await loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.11.0/dist/ffmpeg.min.js');
-    }
-    const {createFFmpeg,fetchFile}=window.FFmpeg;
-    const inst=createFFmpeg({log:false,corePath:'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'});
     if(statusEl) statusEl.innerHTML='<span class="spin"></span>Video engine load ho raha… (pehli dafa ~30MB)';
+    if(!window.FFmpeg){
+      await Promise.race([
+        loadScript('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.0/dist/ffmpeg.min.js'),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('Video engine script 30 second me load nahi hua — internet check karke dobara try karo')),30000))
+      ]);
+    }
+    if(!window.FFmpeg||!window.FFmpeg.createFFmpeg) throw new Error('Video engine load nahi hua — dobara try karo');
+    const {createFFmpeg,fetchFile}=window.FFmpeg;
+    const inst=createFFmpeg({log:false,corePath:'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'});
     await Promise.race([
       inst.load(),
       new Promise((_,rej)=>setTimeout(()=>rej(new Error('Video engine load me 2 minute se zyada lag gaya — WiFi par dobara try karo')),120000))
@@ -376,10 +388,16 @@ async function vidToReels(){
 }
 
 // ─────────── TEXT TO SPEECH ───────────
+let ttsTries=0;
 function ttsVoices(){
   const sel=document.getElementById('ttsVoice');
+  if(!sel) return;
   const vs=speechSynthesis.getVoices();
-  if(!vs.length)return;
+  if(!vs.length){
+    if(ttsTries<6){ttsTries++;setTimeout(ttsVoices,500);return;}
+    sel.innerHTML='<option value="">Awaaz nahi mili — default awaz use hogi</option>';
+    return;
+  }
   sel.innerHTML='';
   vs.forEach((v,i)=>{
     const o=document.createElement('option');o.value=i;o.textContent=v.name+' ('+v.lang+')';
