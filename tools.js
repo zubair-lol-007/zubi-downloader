@@ -242,7 +242,7 @@ async function imgBgRemove(){
   const out='out-bg';outHtml(out,'<span class="spin"></span>AI model load ho raha… (pehli dafa ~40MB download hoga, WiFi behtar hai)');
   try{
     if(!bgMod){
-      bgMod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/index.mjs');
+      bgMod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');
     }
     outHtml(out,'<span class="spin"></span>Photo chhoti ki ja rahi… (phone par tez chalegi)');
     const small=await downscaleBlob(f,1024);
