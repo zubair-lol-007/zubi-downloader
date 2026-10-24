@@ -17,12 +17,42 @@ function chipFilter(el,cat){
   applyFilters();
 }
 function goPanel(id){
+  document.body.classList.add('tool-open');
+  document.querySelectorAll('.card.tool-panel').forEach(c=>c.classList.remove('active'));
   const el=document.getElementById(id);
   if(!el) return;
-  el.scrollIntoView({behavior:'smooth',block:'start'});
-  el.style.borderColor='#9F5FFB';
-  setTimeout(()=>{el.style.borderColor='';},1800);
+  el.classList.add('active');
+  const nm=document.querySelector(`[onclick="goPanel('${id}')"] .nm`);
+  document.getElementById('backbarName').textContent=nm?nm.textContent:'Tool';
+  document.getElementById('backbar').classList.add('show');
+  document.getElementById('resultBanner').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
+function goHome(){
+  document.body.classList.remove('tool-open');
+  document.querySelectorAll('.card.tool-panel').forEach(c=>c.classList.remove('active'));
+  document.getElementById('backbar').classList.remove('show');
+  document.getElementById('resultBanner').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+// jab bhi kisi tool ka download button bane → banner dikhao + us tak scroll karo
+(function(){
+  const obs=new MutationObserver(ms=>{
+    for(const m of ms){
+      for(const n of m.addedNodes){
+        if(n.nodeType!==1) continue;
+        const btn=n.classList&&n.classList.contains('save-btn')?n:(n.querySelector?n.querySelector('.save-btn'):null);
+        if(btn){
+          btn.classList.add('big-dl');
+          const b=document.getElementById('resultBanner');
+          if(b) b.classList.add('show');
+          setTimeout(()=>btn.scrollIntoView({behavior:'smooth',block:'center'}),150);
+        }
+      }
+    }
+  });
+  document.querySelectorAll('.tool-out').forEach(el=>obs.observe(el,{childList:true,subtree:true}));
+})();
 
 // ── helpers ──
 function loadScript(src){
@@ -40,6 +70,11 @@ function loadImg(file){
     img.src=URL.createObjectURL(file);
   });
 }
+// koi bhi tool khamoshi se fail na ho — error seedha log me dikhao
+window.addEventListener('error', function(e){
+  try{ log('⚠️ Error: ' + (e.message || 'unknown error'), 'c-red'); }catch(_){}
+});
+
 function outHtml(id,html){document.getElementById(id).innerHTML=html;}
 function dlBlob(blob,name){
   const a=document.createElement('a');
@@ -340,18 +375,33 @@ function ttsStop(){ if('speechSynthesis' in window) speechSynthesis.cancel(); }
 // ─────────── QR CODE ───────────
 function qrGen(){
   const txt=document.getElementById('qrText').value.trim();
-  if(!txt){alert('Pehle link ya text likho!');return;}
-  const size=parseInt(document.getElementById('qrSize').value);
-  const out=document.getElementById('out-qr');
-  out.innerHTML='';
-  const cv=document.createElement('canvas');
-  QRCode.toCanvas(cv,txt,{width:size,margin:2},err=>{
-    if(err){out.innerHTML='<span class="c-red">❌ QR ban nahi saka: '+err.message+'</span>';return;}
-    out.appendChild(cv);
-    const btn=document.createElement('button');btn.className='save-btn';btn.textContent='💾 QR Code Download Karo (PNG)';
-    btn.onclick=()=>cv.toBlob(b=>dlBlob(b,'ZUBI_QR_'+Date.now()+'.png'),'image/png');
-    out.appendChild(document.createElement('br'));out.appendChild(btn);
-  });
+  const sz=parseInt(document.getElementById('qrSize').value)||256;
+  const out='out-qr';
+  if(!txt){alert('QR ke liye text ya link likho!');return;}
+  if(typeof QRCode==='undefined'){outHtml(out,'<span class="c-red">❌ QR library load nahi hui — internet check karke dobara try karo.</span>');return;}
+  try{
+    const holder=document.createElement('div');
+    new QRCode(holder,{text:txt,width:sz,height:sz,correctLevel:QRCode.CorrectLevel.M});
+    const outEl=document.getElementById(out);
+    outEl.innerHTML='';
+    outEl.appendChild(holder);
+    setTimeout(()=>{
+      const cv=holder.querySelector('canvas');
+      const img=holder.querySelector('img');
+      if(cv){
+        const btn=document.createElement('button');
+        btn.className='save-btn';btn.textContent='⬇️ QR Code Download Karo';
+        btn.onclick=()=>cv.toBlob(b=>dlBlob(b,'ZUBI_QR_'+Date.now()+'.png'),'image/png');
+        outEl.appendChild(btn);
+      }else if(img&&img.src){
+        const a=document.createElement('a');
+        a.className='save-btn';a.textContent='⬇️ QR Code Download Karo';a.download='ZUBI_QR_'+Date.now()+'.png';a.href=img.src;
+        outEl.appendChild(a);
+      }else{
+        outHtml(out,'<span class="c-red">❌ QR ban nahi saka — dobara try karo.</span>');
+      }
+    },400);
+  }catch(e){outHtml(out,'<span class="c-red">❌ '+e.message+'</span>');}
 }
 
 // ─────────── INTERNET SPEED CHECKER ───────────
@@ -385,39 +435,128 @@ async function speedTest(){
   }
 }
 
-// ─────────── WEBSITE TO APP PACK ───────────
-async function webAppPack(){
-  const url=document.getElementById('waUrl').value.trim();
-  if(!url||!url.startsWith('http')){alert('Sahi website link likho (https:// se shuru)!');return;}
-  const out='out-wa';outHtml(out,'<span class="spin"></span>App pack ban raha…');
+// ─────────── WEBSITE TO APK (Android project ZIP + GitHub Actions signed build) ───────────
+function suggestPkg(){
+  const u=document.getElementById('apkUrl').value.trim();
+  const p=document.getElementById('apkPkg');
+  if(!u||p.value.trim())return;
   try{
-    let host='My App';
-    try{host=new URL(url).hostname.replace('www.','');}catch(e){}
-    const manifest={name:host,short_name:host.split('.')[0],start_url:url,display:'standalone',background_color:'#0B0B14',theme_color:'#9F5FFB',icons:[]};
-    const sw=`self.addEventListener('fetch',()=>{}); // basic service worker — apni site ki files ke saath host karo`;
-    const readme=[
-      'ZUBI TOOL — Website To App Pack',
-      '',
-      'OPTION 1 — Phone par install (PWA, 1 minute):',
-      '1. Apni website par manifest.json + sw.js upload karo',
-      '2. Site ke <head> mein ye line daalo: <link rel="manifest" href="manifest.json">',
-      '3. Phone par site kholo → browser menu → "Add to Home Screen"',
-      '   → site app ban kar home screen par aa jayegi!',
-      '',
-      'OPTION 2 — Asli APK (5 minute):',
-      '1. webintoapp.com ya appsgeyser.com kholo',
-      '2. Apni website ka link paste karo: '+url,
-      '3. App ka naam + icon do → APK download karo',
-      '',
-      'Note: APK seedha browser mein nahi ban sakta, is liye ye do tareeqe diye hain.',
-    ].join('\n');
+    const host=new URL(u).hostname.replace(/^www\./,'');
+    const parts=host.split('.');
+    const base=parts.length>=2?parts[parts.length-2]:parts[0];
+    const clean=base.replace(/[^a-z0-9]/gi,'').toLowerCase()||'myapp';
+    p.value='com.'+clean+'.app';
+  }catch(e){}
+}
+function apkIconPng(size,img,color,letter){
+  return new Promise(res=>{
+    const c=document.createElement('canvas');c.width=size;c.height=size;
+    const x=c.getContext('2d');
+    if(img){
+      const s=Math.min(img.naturalWidth,img.naturalHeight);
+      const sx=(img.naturalWidth-s)/2,sy=(img.naturalHeight-s)/2;
+      x.drawImage(img,sx,sy,s,s,0,0,size,size);
+    }else{
+      x.fillStyle=color;x.fillRect(0,0,size,size);
+      x.fillStyle='#fff';x.font='bold '+Math.round(size*0.55)+'px Arial';x.textAlign='center';x.textBaseline='middle';
+      x.fillText(letter, size/2, size/2+size*0.03);
+    }
+    c.toBlob(b=>res(b),'image/png');
+  });
+}
+async function buildApkProject(){
+  const url=document.getElementById('apkUrl').value.trim();
+  const name=document.getElementById('apkName').value.trim();
+  let pkg=document.getElementById('apkPkg').value.trim();
+  const ver=document.getElementById('apkVer').value.trim()||'1.0';
+  const color=document.getElementById('apkColor').value;
+  const orient=document.getElementById('apkOrient').value;
+  const full=document.getElementById('apkFull').checked;
+  const out='out-apk';
+  if(!url||!url.startsWith('http')){alert('Sahi website link likho (https:// se shuru)!');return;}
+  if(!name){alert('App ka naam likho!');return;}
+  if(!pkg){suggestPkg();pkg=document.getElementById('apkPkg').value.trim();}
+  if(!pkg){alert('Package name likho — masalan com.meriwebsite.app');return;}
+  outHtml(out,'<span class="spin"></span>Android project ban raha…');
+  try{
+    const path=pkg.replace(/\./g,'/');
+    const iconFile=document.getElementById('apkIcon').files[0];
+    const iconImg=iconFile?await loadImg(iconFile):null;
+    const letter=name.trim()[0].toUpperCase();
+    const escName=name.replace(/&/g,'&amp;');
     const zip=new JSZip();
-    zip.file('manifest.json',JSON.stringify(manifest,null,2));
-    zip.file('sw.js',sw);
-    zip.file('README.txt',readme);
+    const app='app/src/main/';
+    zip.file('settings.gradle', "rootProject.name = '" + name.replace(/'/g,'') + "'\ninclude ':app'\n");
+    zip.file('build.gradle', "buildscript {\n    repositories { google(); mavenCentral() }\n    dependencies { classpath 'com.android.application:8.2.2' }\n}\nallprojects { repositories { google(); mavenCentral() } }\n");
+    zip.file('gradle.properties', "org.gradle.jvmargs=-Xmx2048m\nandroid.useAndroidX=true\n");
+    zip.file('app/build.gradle',
+      "plugins { id 'com.android.application' }\n\nandroid {\n    namespace '" + pkg + "'\n    compileSdk 34\n    defaultConfig {\n        applicationId '" + pkg + "'\n        minSdk 24\n        targetSdk 34\n        versionCode 1\n        versionName '" + ver + "'\n    }\n    buildTypes { release { minifyEnabled false } }\n    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }\n}\n\ndependencies {\n    implementation 'androidx.appcompat:appcompat:1.6.1'\n    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'\n}\n");
+    zip.file(app+'AndroidManifest.xml',
+      '<?xml version="1.0" encoding="utf-8"?>\n<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n' +
+      '    <uses-permission android:name="android.permission.INTERNET" />\n' +
+      '    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />\n' +
+      '    <application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="' + escName + '" android:theme="@style/Theme.App">\n' +
+      '        <activity android:name=".MainActivity" android:exported="true" android:screenOrientation="' + orient + '"' + (full ? ' android:theme="@style/Theme.App.Fullscreen"' : '') + '>\n' +
+      '            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>\n' +
+      '        </activity>\n    </application>\n</manifest>\n');
+    const kt = 'package ' + pkg + '\n\n' +
+      'import android.content.Intent\nimport android.net.Uri\nimport android.os.Bundle\nimport android.view.View\nimport android.webkit.*\nimport android.widget.ProgressBar\nimport androidx.appcompat.app.AppCompatActivity\nimport androidx.swiperefreshlayout.widget.SwipeRefreshLayout\n\n' +
+      'class MainActivity : AppCompatActivity() {\n' +
+      '    private lateinit var webView: WebView\n    private lateinit var progress: ProgressBar\n    private lateinit var swipe: SwipeRefreshLayout\n    private var fileCallback: ValueCallback<Array<Uri>>? = null\n\n' +
+      '    override fun onCreate(savedInstanceState: Bundle?) {\n' +
+      '        super.onCreate(savedInstanceState)\n        setContentView(R.layout.activity_main)\n        webView = findViewById(R.id.webview)\n        progress = findViewById(R.id.progress)\n        swipe = findViewById(R.id.swipe)\n' +
+      '        val s = webView.settings\n        s.javaScriptEnabled = true\n        s.domStorageEnabled = true\n        s.loadWithOverviewMode = true\n        s.useWideViewPort = true\n        s.setSupportZoom(false)\n        s.userAgentString = s.userAgentString.replace("; wv", "")\n' +
+      '        webView.webViewClient = object : WebViewClient() {\n' +
+      '            override fun onPageFinished(view: WebView?, url: String?) { progress.visibility = View.GONE; swipe.isRefreshing = false }\n' +
+      '            override fun shouldOverrideUrlLoading(view: WebView?, req: WebResourceRequest?): Boolean {\n' +
+      '                val u = req?.url.toString()\n' +
+      '                return if (u.startsWith("' + url + '")) false else { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(u))); true }\n' +
+      '            }\n        }\n' +
+      '        webView.webChromeClient = object : WebChromeClient() {\n' +
+      '            override fun onProgressChanged(view: WebView?, p: Int) { progress.progress = p; progress.visibility = if (p < 100) View.VISIBLE else View.GONE }\n' +
+      '            override fun onShowFileChooser(view: WebView?, cb: ValueCallback<Array<Uri>>?, params: FileChooserParams?): Boolean {\n' +
+      '                fileCallback = cb\n' +
+      '                val intent = Intent(Intent.ACTION_GET_CONTENT).apply { type = "*/*"; addCategory(Intent.CATEGORY_OPENABLE) }\n' +
+      '                startActivityForResult(Intent.createChooser(intent, "File chuno"), 1001)\n                return true\n            }\n        }\n' +
+      '        swipe.setOnRefreshListener { webView.reload() }\n' +
+      '        webView.loadUrl("' + url + '")\n    }\n\n' +
+      '    override fun onActivityResult(code: Int, result: Int, data: Intent?) {\n' +
+      '        super.onActivityResult(code, result, data)\n' +
+      '        if (code == 1001) { fileCallback?.onReceiveValue(if (data?.data != null) arrayOf(data.data!!) else null); fileCallback = null }\n    }\n\n' +
+      '    override fun onBackPressed() { if (webView.canGoBack()) webView.goBack() else super.onBackPressed() }\n}\n';
+    zip.file(app+'java/'+path+'/MainActivity.kt', kt);
+    zip.file(app+'res/layout/activity_main.xml',
+      '<?xml version="1.0" encoding="utf-8"?>\n<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/swipe" android:layout_width="match_parent" android:layout_height="match_parent">\n' +
+      '    <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent">\n' +
+      '        <WebView android:id="@+id/webview" android:layout_width="match_parent" android:layout_height="match_parent" />\n' +
+      '        <ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="4dp" android:max="100" />\n' +
+      '    </FrameLayout>\n</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>\n');
+    zip.file(app+'res/values/strings.xml','<?xml version="1.0" encoding="utf-8"?>\n<resources><string name="app_name">'+escName+'</string></resources>\n');
+    zip.file(app+'res/values/colors.xml','<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="theme">'+color+'</color></resources>\n');
+    zip.file(app+'res/values/themes.xml',
+      '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n' +
+      '    <style name="Theme.App" parent="Theme.AppCompat.Light.NoActionBar">\n        <item name="colorPrimary">@color/theme</item>\n        <item name="android:statusBarColor">@color/theme</item>\n    </style>\n' +
+      '    <style name="Theme.App.Fullscreen" parent="Theme.App">\n        <item name="android:windowFullscreen">true</item>\n    </style>\n</resources>\n');
+    const iconSizes={mdpi:48,hdpi:72,xhdpi:96,xxhdpi:144,xxxhdpi:192};
+    for(const d of Object.keys(iconSizes)){
+      const blob=await apkIconPng(iconSizes[d],iconImg,color,letter);
+      zip.file(app+'res/mipmap-'+d+'/ic_launcher.png',blob);
+      zip.file(app+'res/mipmap-'+d+'/ic_launcher_round.png',blob);
+    }
+    zip.file('.github/workflows/build-apk.yml',
+      'name: Build signed APK\n\non:\n  workflow_dispatch:\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-java@v4\n        with:\n          distribution: temurin\n          java-version: "17"\n      - name: Make keystore\n        run: |\n          keytool -genkeypair -v -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=ZUBI, OU=App, O=ZUBI, C=PK"\n      - name: Build release APK\n        run: |\n          chmod +x gradlew 2>/dev/null || true\n          ./gradlew assembleRelease || gradle assembleRelease\n      - name: Sign APK\n        run: |\n          APK=$(find app/build/outputs/apk/release -name "*.apk" | head -1)\n          echo "Found: $APK"\n          $ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks release.keystore --ks-pass pass:android --key-pass pass:android --out app-release.apk "$APK"\n      - uses: actions/upload-artifact@v4\n        with:\n          name: app-release\n          path: app-release.apk\n');
+    zip.file('README.txt',
+      'ZUBI TOOL — Website To APK (3 minute, free)\n\n' +
+      'STEP 1: GitHub par naya PRIVATE repository banao.\n' +
+      'STEP 2: Is ZIP ki saari files us repo mein upload karo.\n' +
+      'STEP 3: Repo mein Actions tab kholo → "Build signed APK" → Run workflow.\n' +
+      'STEP 4: ~3 minute baad Artifacts mein "app-release" se app-release.apk download karo aur phone mein install karo.\n\n' +
+      'Website: ' + url + '\nApp: ' + name + '\nPackage: ' + pkg + '\nVersion: ' + ver + '\n');
     const blob=await zip.generateAsync({type:'blob'});
-    dlBlob(blob,'ZUBI_AppPack_'+Date.now()+'.zip');
-    outHtml(out,'<span class="c-green">✅ App pack download ho gaya! README mein dono tareeqe likhe hain.</span>');
+    dlBlob(blob,'ZUBI_AndroidApp_'+Date.now()+'.zip');
+    outHtml(out,'<span class="c-green">✅ Android project ZIP download ho gaya!</span>');
+    document.getElementById('apkSteps').style.display='block';
+    document.getElementById('apkSteps').innerHTML='<b>Ab APK banane ke 4 steps:</b><br>1️⃣ GitHub par naya <b>private repository</b> banao<br>2️⃣ ZIP ki saari files us repo mein upload karo<br>3️⃣ Repo mein <b>Actions → Build signed APK → Run workflow</b><br>4️⃣ ~3 minute baad <b>Artifacts → app-release.apk</b> download karke install karo ✅';
   }catch(e){outHtml(out,'<span class="c-red">❌ '+e.message+'</span>');}
 }
 
@@ -495,6 +634,13 @@ async function pdfToWord(){
   const out='out-pw';outHtml(out,'<span class="spin"></span>Word ban raha…');
   try{
     const pages=await pdfTextLines(f);
+    const flat=pages.map((lines,pi)=>'Page '+(pi+1)+'\n'+lines.join('\n')).join('\n\n');
+    if(typeof docx==='undefined'||!docx.Document){
+      const htmlDoc='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>ZUBI</title></head><body>'+flat.split('\n').map(l=>'<p>'+l.replace(/</g,'&lt;')+'</p>').join('')+'</body></html>';
+      dlBlob(new Blob([htmlDoc],{type:'application/msword'}),'ZUBI_PDFtoWord_'+Date.now()+'.doc');
+      outHtml(out,'<span class="c-green">✅ Word file (.doc) download ho gayi!</span>');
+      return;
+    }
     const children=[];
     pages.forEach((lines,pi)=>{
       children.push(new docx.Paragraph({text:'Page '+(pi+1),heading:docx.HeadingLevel.HEADING_2}));
