@@ -123,7 +123,6 @@ body.tool-open .card.tool-panel.active{display:block}
   <span class="chip active" onclick="chipFilter(this,'all')">Sab</span>
   <span class="chip" onclick="chipFilter(this,'dl')">⬇ Download</span>
   <span class="chip" onclick="chipFilter(this,'img')">🖼 Images</span>
-  <span class="chip" onclick="chipFilter(this,'vid')">🎬 Videos</span>
   <span class="chip" onclick="chipFilter(this,'pdf')">📄 PDF</span>
   <span class="chip" onclick="chipFilter(this,'more')">✨ More</span>
 </div>
@@ -138,11 +137,6 @@ body.tool-open .card.tool-panel.active{display:block}
   <div class="tcard" data-cat="img" data-name="image background remover" onclick="goPanel('panel-img-bg')"><div class="ic">🪄</div><div class="nm">Image Background Remover</div><div class="ds">Photo ka background hatayo — transparent PNG</div></div>
   <div class="tcard" data-cat="img" data-name="image to text ocr" onclick="goPanel('panel-img-ocr')"><div class="ic">🔤</div><div class="nm">Image To Text (OCR)</div><div class="ds">Photo mein likha text nikal lo (English + Urdu)</div></div>
   <div class="tcard" data-cat="img" data-name="aspect ratio crop" onclick="goPanel('panel-img-crop')"><div class="ic">✂️</div><div class="nm">Aspect Ratio Crop</div><div class="ds">1:1, 9:16, 16:9, 4:5 mein photo kato</div></div>
-  <div class="tcard" data-cat="vid" data-name="video upscaler" onclick="goPanel('panel-vid-upscale')"><div class="ic">📈</div><div class="nm">Video Upscaler</div><div class="ds">Video ko 720p / 1080p tak bara karo</div></div>
-  <div class="tcard" data-cat="vid" data-name="video enhancer" onclick="goPanel('panel-vid-enhance')"><div class="ic">🎨</div><div class="nm">Video Enhancer</div><div class="ds">Colors, brightness, sharpness se video nikharo</div></div>
-  <div class="tcard" data-cat="vid" data-name="video to mp3 audio" onclick="goPanel('panel-vid-mp3')"><div class="ic">🎵</div><div class="nm">Video To MP3</div><div class="ds">Video se sirf audio (MP3) nikal lo</div></div>
-  <div class="tcard" data-cat="vid" data-name="video to reels vertical" onclick="goPanel('panel-vid-reels')"><div class="ic">📱</div><div class="nm">Video To Reels</div><div class="ds">Video ko 9:16 vertical Reels format mein badlo</div></div>
-  <div class="tcard" data-cat="more" data-name="text to speech" onclick="goPanel('panel-tts')"><div class="ic">🗣️</div><div class="nm">Text To Speech</div><div class="ds">Likha hua text awaaz mein suno</div></div>
   <div class="tcard" data-cat="pdf" data-name="pdf editor" onclick="goPanel('panel-pdf-editor')"><div class="ic">✏️</div><div class="nm">PDF Editor</div><div class="ds">Pages ghumao, hatao, text likho</div></div>
   <div class="tcard" data-cat="pdf" data-name="pdf to word" onclick="goPanel('panel-pdf-word')"><div class="ic">📝</div><div class="nm">PDF To Word</div><div class="ds">PDF ka text Word file mein (text-based)</div></div>
   <div class="tcard" data-cat="pdf" data-name="word to pdf" onclick="goPanel('panel-word-pdf')"><div class="ic">📄</div><div class="nm">Word To PDF</div><div class="ds">Word file ko PDF banao (text-based)</div></div>
@@ -272,31 +266,6 @@ body.tool-open .card.tool-panel.active{display:block}
 <select id="icRatio"><option value="1">1:1 (Square)</option><option value="0.8">4:5 (Portrait post)</option><option value="0.5625">9:16 (Reels/Story)</option><option value="1.7778">16:9 (YouTube)</option><option value="1.5">3:2</option><option value="0.75">3:4</option></select>
 <button class="dl-btn" onclick="imgCrop()">✂️ Crop Karo</button><div class="tool-out" id="out-ic"></div></div>
 
-<!-- ── VIDEO TOOLS (ffmpeg browser engine) ── -->
-<div class="card tool-panel" id="panel-vid-upscale"><div class="panel-title">📈 Video Upscaler</div>
-<input type="file" id="vuFile" accept="video/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
-<select id="vuRes"><option value="1280:720">720p HD</option><option value="1920:1080">1080p Full HD</option></select>
-<button class="dl-btn" onclick="vidUpscale()">📈 Upscale Karo</button>
-<div class="honest">Video phone par hi process hogi (koi upload nahi) — pehli dafa engine load hoga, bari video par waqt lag sakta hai.</div><div class="tool-out" id="out-vu"></div></div>
-
-<div class="card tool-panel" id="panel-vid-enhance"><div class="panel-title">🎨 Video Enhancer</div>
-<input type="file" id="veFile" accept="video/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
-<div class="lbl">Brightness: <span id="veBVal">0</span></div><input type="range" id="veB" min="-0.5" max="0.5" step="0.05" value="0" oninput="document.getElementById('veBVal').textContent=this.value">
-<div class="lbl">Contrast: <span id="veCVal">1</span></div><input type="range" id="veC" min="0.5" max="2" step="0.1" value="1" oninput="document.getElementById('veCVal').textContent=this.value">
-<div class="lbl">Saturation: <span id="veSVal">1</span></div><input type="range" id="veS" min="0" max="3" step="0.1" value="1" oninput="document.getElementById('veSVal').textContent=this.value">
-<div class="lbl">Sharpness: <span id="veShVal">0</span></div><input type="range" id="veSh" min="0" max="2" step="0.1" value="0" oninput="document.getElementById('veShVal').textContent=this.value">
-<button class="dl-btn" onclick="vidEnhance()">🎨 Enhance Karo</button><div class="tool-out" id="out-ve"></div></div>
-
-<div class="card tool-panel" id="panel-vid-mp3"><div class="panel-title">🎵 Video To MP3</div>
-<input type="file" id="vmFile" accept="video/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
-<button class="dl-btn" onclick="vidToMp3()">🎵 MP3 Nikalo</button><div class="tool-out" id="out-vm"></div></div>
-
-<div class="card tool-panel" id="panel-vid-reels"><div class="panel-title">📱 Video To Reels</div>
-<input type="file" id="vrFile" accept="video/*" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
-<label style="font-size:12px;color:#b8b8d0"><input type="checkbox" id="vrTrim" checked> 90 second tak trim karo (Reels limit)</label>
-<div class="hint" style="margin:4px 0 8px">Video ko 9:16 vertical banaya jayega — kinare blur background ke saath, taake poori video nazar aaye.</div>
-<button class="dl-btn" onclick="vidToReels()">📱 Reels Banao</button><div class="tool-out" id="out-vr"></div></div>
-
 <!-- ── PDF TOOLS ── -->
 <div class="card tool-panel" id="panel-pdf-editor"><div class="panel-title">✏️ PDF Editor</div>
 <input type="file" id="peFile" accept="application/pdf" style="margin-bottom:8px;color:#b8b8d0;font-size:12px">
@@ -337,13 +306,6 @@ body.tool-open .card.tool-panel.active{display:block}
 <button class="dl-btn" onclick="excelToPdf()">📈 PDF Banao</button><div class="tool-out" id="out-xp"></div></div>
 
 <!-- ── MORE TOOLS ── -->
-<div class="card tool-panel" id="panel-tts"><div class="panel-title">🗣️ Text To Speech</div>
-<textarea id="ttsText" placeholder="Yahan text likho — phir Play dabao, phone khud parh kar sunayega…"></textarea>
-<select id="ttsVoice"><option value="">Awaaz load ho rahi…</option></select>
-<div class="lbl">Speed: <span id="ttsRVal">1</span></div><input type="range" id="ttsRate" min="0.5" max="2" step="0.1" value="1" oninput="document.getElementById('ttsRVal').textContent=this.value">
-<div class="mini-row"><button class="mini-btn" onclick="ttsPlay()">▶️ Play</button><button class="mini-btn" onclick="ttsStop()">⏹️ Stop</button></div>
-<div class="honest">Awaazein aapke phone/browser par depend karti hain — Urdu awaaz har device par nahi hoti.</div></div>
-
 <div class="card tool-panel" id="panel-qr"><div class="panel-title">🔲 QRCode Generator</div>
 <input type="text" id="qrText" placeholder="Link ya text likho — masalan https://example.com">
 <select id="qrSize"><option value="256">Medium (256px)</option><option value="512">Large (512px)</option><option value="128">Small (128px)</option></select>
@@ -847,6 +809,6 @@ async function dlThumb(url,q){
   }catch(e){window.open(url,'_blank');}
 }
 </script>
-<script src="tools.js?v=4.3"></script>
+<script src="tools.js?v=4.4"></script>
 </body>
 </html>
