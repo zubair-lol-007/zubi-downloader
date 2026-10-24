@@ -220,15 +220,37 @@ async function imgResize(){
 }
 // ── IMAGE: Background remover (AI, on-device) ──
 let bgMod=null;
+function downscaleBlob(file,maxDim){
+  return new Promise((res,rej)=>{
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const scale=Math.min(1,maxDim/Math.max(img.naturalWidth,img.naturalHeight));
+      const w=Math.max(1,Math.round(img.naturalWidth*scale));
+      const h=Math.max(1,Math.round(img.naturalHeight*scale));
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      c.toBlob(b=>b?res(b):rej(new Error('photo read fail')),'image/png');
+    };
+    img.onerror=()=>rej(new Error('photo khul nahi saki'));
+    img.src=url;
+  });
+}
 async function imgBgRemove(){
   const f=fileOf('bgFile');if(!f)return;
-  const out='out-bg';outHtml(out,'<span class="spin"></span>AI model load ho raha… (pehli dafa thoda waqt lagega)');
+  const out='out-bg';outHtml(out,'<span class="spin"></span>AI model load ho raha… (pehli dafa ~40MB download hoga, WiFi behtar hai)');
   try{
     if(!bgMod){
       bgMod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/index.mjs');
     }
+    outHtml(out,'<span class="spin"></span>Photo chhoti ki ja rahi… (phone par tez chalegi)');
+    const small=await downscaleBlob(f,1024);
     outHtml(out,'<span class="spin"></span>Background hataya ja raha…');
-    const blob=await bgMod.removeBackground(f);
+    const blob=await Promise.race([
+      bgMod.removeBackground(small),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('MODEL_TIMEOUT')),120000))
+    ]);
     const url=URL.createObjectURL(blob);
     const img=new Image();img.src=url;
     outHtml(out,'<span class="c-green">✅ Background hat gaya!</span>');
@@ -236,7 +258,13 @@ async function imgBgRemove(){
     const btn=document.createElement('button');btn.className='save-btn';btn.textContent='💾 Transparent PNG Download Karo';
     btn.onclick=()=>dlBlob(blob,'ZUBI_NoBG_'+Date.now()+'.png');
     document.getElementById(out).appendChild(btn);
-  }catch(e){outHtml(out,'<span class="c-red">❌ Background remover load nahi ho saka — internet check karke dobara try karo. ('+e.message+')</span>');}
+  }catch(e){
+    if(e.message==='MODEL_TIMEOUT'){
+      outHtml(out,'<span class="c-red">❌ 2 minute me AI model download nahi ho saka — WiFi par dobara try karo, ya chhoti photo use karo.</span>');
+    }else{
+      outHtml(out,'<span class="c-red">❌ Background remover load nahi ho saka — internet check karke dobara try karo. ('+e.message+')</span>');
+    }
+  }
 }
 // ── IMAGE: OCR ──
 async function imgOcr(){
@@ -291,10 +319,14 @@ async function ensureFFmpeg(statusEl){
     const {createFFmpeg,fetchFile}=window.FFmpeg;
     const inst=createFFmpeg({log:false,corePath:'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'});
     if(statusEl) statusEl.innerHTML='<span class="spin"></span>Video engine load ho raha… (pehli dafa ~30MB)';
-    await inst.load();
+    await Promise.race([
+      inst.load(),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('Video engine load me 2 minute se zyada lag gaya — WiFi par dobara try karo')),120000))
+    ]);
     ff={inst,fetchFile};
     return ff;
   })();
+  ffLoading.catch(()=>{ffLoading=null;});
   return ffLoading;
 }
 async function runVideo(inFile,args,outName,outId){
