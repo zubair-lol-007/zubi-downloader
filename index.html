@@ -98,6 +98,8 @@ input[type=range]{width:100%;margin-bottom:8px}
 body.tool-open .grid,body.tool-open #toolSearch,body.tool-open #chips,body.tool-open .note{display:none}
 body.tool-open .card.tool-panel{display:none}
 body.tool-open .card.tool-panel.active{display:block}
+.card.tool-panel{display:none}
+.card.tool-panel.active{display:block}
 </style>
 </head>
 <body>
@@ -149,12 +151,12 @@ body.tool-open .card.tool-panel.active{display:block}
   <div class="tcard" data-cat="pdf" data-name="pdf to excel" onclick="goPanel('panel-pdf-excel')"><div class="ic">📊</div><div class="nm">PDF To Excel</div><div class="ds">PDF ka text Excel sheet mein (text-based)</div></div>
   <div class="tcard" data-cat="pdf" data-name="excel to pdf" onclick="goPanel('panel-excel-pdf')"><div class="ic">📈</div><div class="nm">Excel To PDF</div><div class="ds">Excel sheet ko PDF banao</div></div>
   <div class="tcard" data-cat="more" data-name="qrcode generator" onclick="goPanel('panel-qr')"><div class="ic">🔲</div><div class="nm">QRCode Generator</div><div class="ds">Link ya text ka QR code banao</div></div>
-  <div class="tcard" data-cat="more" data-name="website to apk converter app" onclick="goPanel('panel-web-apk')"><div class="ic">📲</div><div class="nm">Website To App</div><div class="ds">Website ka installable app pack + APK guide</div></div>
+  <div class="tcard" data-cat="more" data-name="website to apk converter app" onclick="goPanel('panel-web-apk')"><div class="ic">📲</div><div class="nm">Website To APK</div><div class="ds">Android project ZIP + GitHub Actions se signed APK</div></div>
   <div class="tcard" data-cat="more" data-name="internet speed checker" onclick="goPanel('panel-speed')"><div class="ic">🚀</div><div class="nm">Internet Speed Checker</div><div class="ds">Download / Upload speed + ping check karo</div></div>
+  <div class="tcard" data-cat="dl" data-name="youtube thumbnail downloader" onclick="goPanel('panel-thumb')"><div class="ic">🖼️</div><div class="nm">YouTube Thumbnail Downloader</div><div class="ds">Kisi bhi YouTube video ka HD thumbnail lo</div></div>
 </div>
 
-<div class="note">📌 <b>YouTube / RedNote:</b> pehle auto download try hoga. Agar koi mushkil link fail ho jaye to us video ke neeche <b>WhatsApp wala button</b> ayega — wahan link bhejo, download karke wapas bhej diya jayega! 💬  <div class="tcard" data-cat="dl" data-name="youtube thumbnail downloader" onclick="goPanel('panel-thumb')"><div class="ic">🖼️</div><div class="nm">YouTube Thumbnail Downloader</div><div class="ds">Kisi bhi YouTube video ka HD thumbnail lo</div></div>
-</div>
+<div class="note">📌 <b>YouTube / RedNote:</b> pehle auto download try hoga. Agar koi mushkil link fail ho jaye to us video ke neeche <b>WhatsApp wala button</b> ayega — wahan link bhejo, download karke wapas bhej diya jayega! 💬</div>
 
 <div class="backbar" id="backbar"><button onclick="goHome()">← Sab Tools</button><span id="backbarName">Tool</span></div>
 <div class="result-banner" id="resultBanner">✅ Tayyar! Download button neeche hai 👇</div>
@@ -163,7 +165,6 @@ body.tool-open .card.tool-panel.active{display:block}
   <div class="card-label">📎 Video Links (ek line mein ek — max 10)</div>
   <textarea id="urlInput" placeholder="https://www.tiktok.com/@...&#10;https://www.youtube.com/watch?v=...&#10;https://www.instagram.com/reel/...&#10;https://www.facebook.com/...&#10;http://xhslink.com/..."></textarea>
   <div class="hint">TikTok, Instagram, Facebook, YouTube ya RedNote ke links paste karo — ya poora chat text paste karke neeche wala "Links Nikalo" dabao</div>
-</div>
 
 <div class="mini-row">
   <button class="mini-btn" onclick="extractLinks()">🧹 Links Nikalo (chat text se)</button>
@@ -175,6 +176,7 @@ body.tool-open .card.tool-panel.active{display:block}
 <button class="zip-btn" id="allBtn" onclick="downloadAllSeparate()" style="background:linear-gradient(135deg,#7C3AED,#EC4899)">⬇ SAB ALAG ALAG DOWNLOAD KARO</button>
 
 <div id="items"></div>
+</div>
 
 <div class="card tool-panel" id="panel-fbupload">
   <div class="card-label">📘 Facebook Bulk Upload — Page Par Videos</div>
